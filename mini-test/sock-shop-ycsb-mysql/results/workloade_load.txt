@@ -1,0 +1,26 @@
+Using request distribution 'zipfian' a keyrange of [0 110000]
+***************** properties *****************
+"table"="usertable"
+"updateproportion"="0"
+"operationcount"="100000"
+"mysql.host"="mysql"
+"scanlengthdistribution"="uniform"
+"readallfields"="true"
+"mysql.port"="3306"
+"requestdistribution"="zipfian"
+"insertproportion"="0.05"
+"dotransactions"="false"
+"recordcount"="100000"
+"readproportion"="0"
+"command"="load"
+"maxscanlength"="100"
+"workload"="core"
+"mysql.db"="sockshop"
+"mysql.password"="sockshop"
+"scanproportion"="0.95"
+"mysql.user"="sockshop"
+**********************************************
+**********************************************
+Run finished, takes 8.050628337s
+INSERT - Takes(s): 8.1, Count: 100000, OPS: 12422.0, Avg(us): 71, Min(us): 41, Max(us): 6695, 50th(us): 72, 90th(us): 97, 95th(us): 106, 99th(us): 129, 99.9th(us): 335, 99.99th(us): 1259
+TOTAL  - Takes(s): 8.1, Count: 100000, OPS: 12422.2, Avg(us): 71, Min(us): 41, Max(us): 6695, 50th(us): 72, 90th(us): 97, 95th(us): 106, 99th(us): 129, 99.9th(us): 335, 99.99th(us): 1259

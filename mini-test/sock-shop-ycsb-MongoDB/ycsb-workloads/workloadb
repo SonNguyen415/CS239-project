@@ -1,0 +1,14 @@
+# Yahoo! Cloud System Benchmark
+# Workload B: Read mostly workload (Product Catalog)
+recordcount=100000
+operationcount=100000
+workload=core
+
+readallfields=true
+
+readproportion=0.95
+updateproportion=0.05
+scanproportion=0
+insertproportion=0
+
+requestdistribution=zipfian

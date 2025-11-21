@@ -1,0 +1,33 @@
+Using request distribution 'zipfian' a keyrange of [0 110000]
+***************** properties *****************
+"mysql.password"="sockshop"
+"mysql.host"="sock-shop-mysql-db"
+"mysql.user"="sockshop"
+"maxscanlength"="100"
+"updateproportion"="0"
+"insertproportion"="0.05"
+"mysql.port"="3306"
+"dotransactions"="true"
+"requestdistribution"="zipfian"
+"scanproportion"="0.95"
+"mysql.db"="sockshop"
+"readproportion"="0"
+"command"="run"
+"table"="usertable"
+"readallfields"="true"
+"recordcount"="100000"
+"operationcount"="100000"
+"scanlengthdistribution"="uniform"
+"workload"="core"
+**********************************************
+INSERT - Takes(s): 10.0, Count: 1881, OPS: 188.2, Avg(us): 1095, Min(us): 466, Max(us): 6847, 50th(us): 1037, 90th(us): 1379, 95th(us): 1592, 99th(us): 2577, 99.9th(us): 6231, 99.99th(us): 6847
+SCAN   - Takes(s): 10.0, Count: 35990, OPS: 3600.0, Avg(us): 217, Min(us): 46, Max(us): 4159, 50th(us): 185, 90th(us): 315, 95th(us): 428, 99th(us): 1104, 99.9th(us): 1997, 99.99th(us): 3211
+TOTAL  - Takes(s): 10.0, Count: 37871, OPS: 3788.1, Avg(us): 261, Min(us): 46, Max(us): 6847, 50th(us): 190, 90th(us): 414, 95th(us): 928, 99th(us): 1366, 99.9th(us): 2411, 99.99th(us): 4159
+INSERT - Takes(s): 20.0, Count: 3834, OPS: 191.7, Avg(us): 1084, Min(us): 466, Max(us): 7711, 50th(us): 1036, 90th(us): 1374, 95th(us): 1581, 99th(us): 2427, 99.9th(us): 4915, 99.99th(us): 7711
+SCAN   - Takes(s): 20.0, Count: 72877, OPS: 3644.1, Avg(us): 214, Min(us): 46, Max(us): 4159, 50th(us): 183, 90th(us): 305, 95th(us): 411, 99th(us): 1094, 99.9th(us): 1922, 99.99th(us): 2919
+TOTAL  - Takes(s): 20.0, Count: 76711, OPS: 3835.9, Avg(us): 257, Min(us): 46, Max(us): 7711, 50th(us): 188, 90th(us): 399, 95th(us): 924, 99th(us): 1355, 99.9th(us): 2227, 99.99th(us): 4123
+**********************************************
+Run finished, takes 26.473490763s
+INSERT - Takes(s): 26.5, Count: 5030, OPS: 190.0, Avg(us): 1100, Min(us): 466, Max(us): 13239, 50th(us): 1037, 90th(us): 1379, 95th(us): 1607, 99th(us): 2599, 99.9th(us): 7711, 99.99th(us): 10143
+SCAN   - Takes(s): 26.5, Count: 94970, OPS: 3587.7, Avg(us): 217, Min(us): 46, Max(us): 19711, 50th(us): 183, 90th(us): 305, 95th(us): 415, 99th(us): 1120, 99.9th(us): 2207, 99.99th(us): 7503
+TOTAL  - Takes(s): 26.5, Count: 100000, OPS: 3777.7, Avg(us): 261, Min(us): 46, Max(us): 19711, 50th(us): 188, 90th(us): 404, 95th(us): 933, 99th(us): 1376, 99.9th(us): 2773, 99.99th(us): 8011

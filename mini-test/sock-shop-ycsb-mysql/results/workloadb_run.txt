@@ -1,0 +1,28 @@
+Using request distribution 'zipfian' a keyrange of [0 100000]
+***************** properties *****************
+"recordcount"="100000"
+"readproportion"="0.95"
+"dotransactions"="true"
+"mysql.host"="sock-shop-mysql-db"
+"mysql.password"="sockshop"
+"readallfields"="true"
+"scanproportion"="0"
+"insertproportion"="0"
+"mysql.user"="sockshop"
+"table"="usertable"
+"mysql.db"="sockshop"
+"updateproportion"="0.05"
+"operationcount"="100000"
+"requestdistribution"="zipfian"
+"command"="run"
+"mysql.port"="3306"
+"workload"="core"
+**********************************************
+READ   - Takes(s): 10.0, Count: 74065, OPS: 7406.9, Avg(us): 81, Min(us): 44, Max(us): 2229, 50th(us): 75, 90th(us): 108, 95th(us): 119, 99th(us): 181, 99.9th(us): 662, 99.99th(us): 1403
+TOTAL  - Takes(s): 10.0, Count: 77922, OPS: 7792.4, Avg(us): 126, Min(us): 44, Max(us): 5531, 50th(us): 77, 90th(us): 118, 95th(us): 591, 99th(us): 1072, 99.9th(us): 2261, 99.99th(us): 3401
+UPDATE - Takes(s): 10.0, Count: 3857, OPS: 385.9, Avg(us): 991, Min(us): 459, Max(us): 5531, 50th(us): 937, 90th(us): 1290, 95th(us): 1614, 99th(us): 2597, 99.9th(us): 4019, 99.99th(us): 5531
+**********************************************
+Run finished, takes 12.865982464s
+READ   - Takes(s): 12.9, Count: 95029, OPS: 7386.4, Avg(us): 81, Min(us): 44, Max(us): 3775, 50th(us): 75, 90th(us): 108, 95th(us): 119, 99th(us): 181, 99.9th(us): 655, 99.99th(us): 1393
+TOTAL  - Takes(s): 12.9, Count: 100000, OPS: 7772.7, Avg(us): 126, Min(us): 44, Max(us): 6775, 50th(us): 77, 90th(us): 118, 95th(us): 602, 99th(us): 1080, 99.9th(us): 2241, 99.99th(us): 3691
+UPDATE - Takes(s): 12.9, Count: 4971, OPS: 386.5, Avg(us): 993, Min(us): 459, Max(us): 6775, 50th(us): 937, 90th(us): 1293, 95th(us): 1614, 99th(us): 2517, 99.9th(us): 4065, 99.99th(us): 6775

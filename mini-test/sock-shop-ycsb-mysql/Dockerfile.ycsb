@@ -1,0 +1,27 @@
+# Multi-stage build for go-ycsb on ARM64
+FROM golang:1.21-alpine AS builder
+
+# Install build dependencies
+RUN apk add --no-cache git make gcc musl-dev
+
+# Clone and build go-ycsb
+WORKDIR /build
+RUN git clone https://github.com/pingcap/go-ycsb.git . && \
+    make
+
+# Final stage - minimal runtime image
+FROM alpine:latest
+
+# Install runtime dependencies
+RUN apk add --no-cache ca-certificates
+
+# Copy the compiled binary from builder
+COPY --from=builder /build/bin/go-ycsb /usr/local/bin/go-ycsb
+
+# Make sure it's executable
+RUN chmod +x /usr/local/bin/go-ycsb
+
+WORKDIR /app
+
+# Keep container running
+CMD ["tail", "-f", "/dev/null"]

@@ -1,0 +1,14 @@
+# Yahoo! Cloud System Benchmark
+# Workload A: Update heavy workload (Session/Shopping Cart)
+recordcount=100000
+operationcount=100000
+workload=core
+
+readallfields=true
+
+readproportion=0.50
+updateproportion=0.50
+scanproportion=0
+insertproportion=0
+
+requestdistribution=zipfian

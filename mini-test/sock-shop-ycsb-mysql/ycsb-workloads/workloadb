@@ -1,0 +1,21 @@
+# Yahoo! Cloud System Benchmark
+# Workload B: Read mostly workload (Product Catalog)
+recordcount=100000
+operationcount=100000
+workload=core
+
+readallfields=true
+
+readproportion=0.95
+updateproportion=0.05
+scanproportion=0
+insertproportion=0
+
+requestdistribution=zipfian
+
+# MySQL specific settings
+mysql.host=mysql
+mysql.port=3306
+mysql.user=sockshop
+mysql.password=sockshop
+mysql.db=sockshop

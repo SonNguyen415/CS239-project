@@ -1,0 +1,46 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: sock-shop-mysql-db
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=sockshop
+      - MYSQL_USER=sockshop
+      - MYSQL_PASSWORD=sockshop
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init-mysql.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - sock-shop-mysql-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-ppassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: --default-authentication-plugin=mysql_native_password
+
+  ycsb:
+    build:
+      context: .
+      dockerfile: Dockerfile.ycsb
+    container_name: ycsb-mysql-benchmark
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - sock-shop-mysql-net
+    volumes:
+      - ./ycsb-workloads:/workloads
+      - ./results:/results
+    command: tail -f /dev/null
+    environment:
+      - MYSQL_URL=mysql:sockshop@tcp(mysql:3306)/sockshop
+
+volumes:
+  mysql_data:
+
+networks:
+  sock-shop-mysql-net:
+    driver: bridge

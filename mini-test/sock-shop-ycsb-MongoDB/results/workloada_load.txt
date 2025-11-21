@@ -1,0 +1,34 @@
+Using request distribution 'zipfian' a keyrange of [0 100000]
+Connected to MongoDB!
+***************** properties *****************
+"scanproportion"="0"
+"dotransactions"="false"
+"readproportion"="0.50"
+"readallfields"="true"
+"requestdistribution"="zipfian"
+"command"="load"
+"table"="usertable"
+"updateproportion"="0.50"
+"recordcount"="100000"
+"insertproportion"="0"
+"mongodb.collection"="usertable"
+"operationcount"="100000"
+"workload"="core"
+"mongodb.url"="mongodb://mongodb:27017/sockshop"
+**********************************************
+INSERT - Takes(s): 10.0, Count: 14079, OPS: 1412.8, Avg(us): 679, Min(us): 410, Max(us): 45119, 50th(us): 667, 90th(us): 769, 95th(us): 810, 99th(us): 951, 99.9th(us): 2040, 99.99th(us): 35167
+TOTAL  - Takes(s): 10.0, Count: 14079, OPS: 1412.8, Avg(us): 679, Min(us): 410, Max(us): 45119, 50th(us): 667, 90th(us): 769, 95th(us): 810, 99th(us): 951, 99.9th(us): 2040, 99.99th(us): 35167
+INSERT - Takes(s): 20.0, Count: 28549, OPS: 1429.9, Avg(us): 669, Min(us): 380, Max(us): 45119, 50th(us): 659, 90th(us): 767, 95th(us): 811, 99th(us): 972, 99.9th(us): 2137, 99.99th(us): 5699
+TOTAL  - Takes(s): 20.0, Count: 28549, OPS: 1429.9, Avg(us): 669, Min(us): 380, Max(us): 45119, 50th(us): 659, 90th(us): 767, 95th(us): 811, 99th(us): 972, 99.9th(us): 2137, 99.99th(us): 5699
+INSERT - Takes(s): 30.0, Count: 43032, OPS: 1436.0, Avg(us): 665, Min(us): 380, Max(us): 45119, 50th(us): 658, 90th(us): 766, 95th(us): 810, 99th(us): 961, 99.9th(us): 1986, 99.99th(us): 4779
+TOTAL  - Takes(s): 30.0, Count: 43032, OPS: 1436.1, Avg(us): 665, Min(us): 380, Max(us): 45119, 50th(us): 658, 90th(us): 766, 95th(us): 810, 99th(us): 961, 99.9th(us): 1986, 99.99th(us): 4779
+INSERT - Takes(s): 40.0, Count: 57622, OPS: 1441.8, Avg(us): 662, Min(us): 350, Max(us): 45119, 50th(us): 654, 90th(us): 764, 95th(us): 810, 99th(us): 964, 99.9th(us): 1997, 99.99th(us): 5999
+TOTAL  - Takes(s): 40.0, Count: 57622, OPS: 1441.8, Avg(us): 662, Min(us): 350, Max(us): 45119, 50th(us): 654, 90th(us): 764, 95th(us): 810, 99th(us): 964, 99.9th(us): 1997, 99.99th(us): 5999
+INSERT - Takes(s): 50.0, Count: 72293, OPS: 1446.8, Avg(us): 660, Min(us): 350, Max(us): 45119, 50th(us): 652, 90th(us): 760, 95th(us): 805, 99th(us): 955, 99.9th(us): 1997, 99.99th(us): 5999
+TOTAL  - Takes(s): 50.0, Count: 72293, OPS: 1446.9, Avg(us): 660, Min(us): 350, Max(us): 45119, 50th(us): 652, 90th(us): 760, 95th(us): 805, 99th(us): 955, 99.9th(us): 1997, 99.99th(us): 5999
+INSERT - Takes(s): 60.0, Count: 87139, OPS: 1453.2, Avg(us): 657, Min(us): 350, Max(us): 45119, 50th(us): 650, 90th(us): 757, 95th(us): 801, 99th(us): 945, 99.9th(us): 1910, 99.99th(us): 5699
+TOTAL  - Takes(s): 60.0, Count: 87139, OPS: 1453.2, Avg(us): 657, Min(us): 350, Max(us): 45119, 50th(us): 650, 90th(us): 757, 95th(us): 801, 99th(us): 945, 99.9th(us): 1910, 99.99th(us): 5699
+**********************************************
+Run finished, takes 1m8.644933596s
+INSERT - Takes(s): 68.6, Count: 100000, OPS: 1457.5, Avg(us): 655, Min(us): 342, Max(us): 45119, 50th(us): 649, 90th(us): 754, 95th(us): 798, 99th(us): 938, 99.9th(us): 1841, 99.99th(us): 5999
+TOTAL  - Takes(s): 68.6, Count: 100000, OPS: 1457.5, Avg(us): 655, Min(us): 342, Max(us): 45119, 50th(us): 649, 90th(us): 754, 95th(us): 798, 99th(us): 938, 99.9th(us): 1841, 99.99th(us): 5999

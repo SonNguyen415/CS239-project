@@ -1,0 +1,18 @@
+# Yahoo! Cloud System Benchmark
+# Workload E: Short ranges (Analytics queries)
+recordcount=100000
+operationcount=100000
+workload=core
+
+readallfields=true
+
+readproportion=0
+updateproportion=0
+scanproportion=0.95
+insertproportion=0.05
+
+requestdistribution=zipfian
+
+# Scan length distribution
+maxscanlength=100
+scanlengthdistribution=uniform

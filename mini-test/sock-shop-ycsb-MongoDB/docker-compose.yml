@@ -1,0 +1,41 @@
+services:
+  mongodb:
+    image: mongo:4.4
+    container_name: sock-shop-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=sockshop
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - sock-shop-mongodb-net
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ycsb:
+    build:
+      context: .
+      dockerfile: Dockerfile.ycsb
+    container_name: ycsb-mongodb-benchmark
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - sock-shop-mongodb-net
+    volumes:
+      - ./ycsb-workloads:/workloads
+      - ./results:/results
+    command: tail -f /dev/null
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017/sockshop
+
+volumes:
+  mongodb_data:
+
+networks:
+  sock-shop-mongodb-net:
+    driver: bridge
