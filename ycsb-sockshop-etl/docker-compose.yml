@@ -1,0 +1,72 @@
+services:
+  ycsb-etl:
+    build: .
+    container_name: ycsb-sockshop-etl
+    hostname: ycsb-etl
+    networks:
+      - sockshop
+    environment:
+      # MongoDB Configuration
+      - MONGODB_HOST=carts-db
+      - MONGODB_PORT=27017
+      - MONGODB_DATABASE=carts-1
+      # Uncomment if MongoDB requires authentication
+      # - MONGODB_USERNAME=admin
+      # - MONGODB_PASSWORD=password
+      
+      # YCSB Workload Configuration
+      - YCSB_WORKLOAD=load
+      - OPERATION_COUNT=1000
+      - RECORD_COUNT=1000
+      - BATCH_SIZE=100
+      
+      # Python Configuration
+      - PYTHONUNBUFFERED=1
+    
+    volumes:
+      # Mount logs directory for output
+      - ./logs:/app/logs
+      # Mount data directory for exports
+      - ./data:/app/data
+    
+    depends_on:
+      - carts-db
+    
+    # Don't restart automatically - run once per workload
+    restart: "no"
+    
+    # Override command for different operations
+    # command: python etl_pipeline.py
+
+  # Standalone MongoDB for testing (if not using existing Sock Shop)
+  # Uncomment this section if you want to run independently
+  carts-db:
+    image: mongo:4.4
+    container_name: carts-db
+    hostname: carts-db
+    networks:
+      - sockshop
+    ports:
+      - "27017:27017"
+    volumes:
+      - carts-db-data:/data/db
+      - ./config/mongodb.conf:/etc/mongo/mongodb.conf:ro
+    environment:
+      - MONGO_INITDB_DATABASE=carts-1
+      # Uncomment for authentication
+      # - MONGO_INITDB_ROOT_USERNAME=admin
+      # - MONGO_INITDB_ROOT_PASSWORD=password
+    # command: --config /etc/mongo/mongodb.conf
+
+networks:
+  sockshop:
+    # Use external: true if connecting to existing Sock Shop network
+    # external: true
+    # name: microservices-demo_default
+    
+    # Or create new network for standalone testing
+    driver: bridge
+
+volumes:
+  carts-db-data:
+    driver: local

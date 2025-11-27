@@ -1,0 +1,77 @@
+# MongoDB Configuration File for YCSB ETL Pipeline
+# See: https://docs.mongodb.com/manual/reference/configuration-options/
+
+# Network settings
+net:
+  port: 27017
+  bindIp: 0.0.0.0
+  maxIncomingConnections: 1000
+  wireObjectCheck: true
+  ipv6: false
+
+# Storage settings
+storage:
+  dbPath: /data/db
+  journal:
+    enabled: true
+    commitIntervalMs: 100
+  directoryPerDB: true
+  engine: wiredTiger
+  wiredTiger:
+    engineConfig:
+      # Cache size: 50% of RAM (adjust based on container resources)
+      cacheSizeGB: 1
+      journalCompressor: snappy
+      directoryForIndexes: false
+    collectionConfig:
+      blockCompressor: snappy
+    indexConfig:
+      prefixCompression: true
+
+# Logging settings
+systemLog:
+  destination: file
+  path: /var/log/mongodb/mongod.log
+  logAppend: true
+  logRotate: reopen
+  verbosity: 0
+  component:
+    accessControl:
+      verbosity: 0
+    command:
+      verbosity: 0
+
+# Process Management
+processManagement:
+  fork: false
+  timeZoneInfo: /usr/share/zoneinfo
+
+# Security settings (uncomment if using authentication)
+# security:
+#   authorization: enabled
+#   javascriptEnabled: true
+
+# Performance tuning for YCSB workloads
+operationProfiling:
+  mode: slowOp
+  slowOpThresholdMs: 100
+
+# Replication (uncomment for replica set)
+# replication:
+#   replSetName: rs0
+#   oplogSizeMB: 1024
+
+# Performance settings
+setParameter:
+  # Improve connection handling
+  connPoolMaxShardedConnsPerHost: 200
+  connPoolMaxConnsPerHost: 200
+  
+  # Disable transparent huge pages warning
+  disableTransparentHugePages: true
+  
+  # Query execution settings
+  internalQueryExecMaxBlockingSortBytes: 33554432
+  
+  # Write concern
+  enableTestCommands: 0

@@ -1,0 +1,14 @@
+{
+  "timestamp": "2025-11-26T07:06:38.304822",
+  "configuration": {
+    "workload_type": "load",
+    "operation_count": 1000,
+    "record_count": 1000,
+    "batch_size": 100
+  },
+  "database": {
+    "host": "carts-db",
+    "port": 27017,
+    "database": "carts-1"
+  }
+}

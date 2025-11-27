@@ -1,0 +1,48 @@
+{
+  "timestamp": "2025-11-26T07:17:14.259968",
+  "configuration": {
+    "workload_type": "a",
+    "operation_count": 10000,
+    "record_count": 1000,
+    "batch_size": 100
+  },
+  "database": {
+    "host": "carts-db",
+    "port": 27017,
+    "database": "carts-1"
+  },
+  "statistics": {
+    "workload": "A",
+    "runtime_seconds": 1.71,
+    "total_operations": 10000,
+    "throughput_ops_sec": 5853.79,
+    "operations": {
+      "reads": 5004,
+      "updates": 4996,
+      "scans": 0,
+      "inserts": 0
+    },
+    "errors": 0,
+    "latency_ms": {
+      "read": {
+        "min": 0.1,
+        "max": 6.69,
+        "avg": 0.16,
+        "p50": 0.16,
+        "p95": 0.2,
+        "p99": 0.31,
+        "p999": 1.07
+      },
+      "update": {
+        "min": 0.1,
+        "max": 13.74,
+        "avg": 0.18,
+        "p50": 0.17,
+        "p95": 0.21,
+        "p99": 0.34,
+        "p999": 2.09
+      }
+    },
+    "summary": "Completed in 1.71s, Throughput: 5853.79 ops/sec, Total: 10000 ops, Reads: 5004, Updates: 4996"
+  }
+}
