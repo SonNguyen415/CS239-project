@@ -23,10 +23,10 @@
 
 # inside docker-compose-users-db-1
 # look at new usertable
-mongo
-show dbs
-use users
-show collections
+mongo \
+show dbs \
+use users \
+show collections \
 db.usertable.find()
 # drop usertable
 mongo users --eval "db.usertable.drop()"
