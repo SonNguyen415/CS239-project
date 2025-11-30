@@ -3,7 +3,7 @@
 
 # inside ycsb_interface
 # Target a specific database and add collection usertable (ycsb standard)
-# Load phase
+# Load phase (you can use workload a,b,e or iworkload interchangeably)
 ~/ycsb-0.17.0/bin/ycsb.sh load mongodb -s -P ~/ycsb-0.17.0/workloads/iworkload -p recordcount=1000 -p mongodb.url="mongodb://docker-compose-user-db-1:27017/users" -p mongodb.collection=usertable
 # Run workload A
 ~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloada \
@@ -61,3 +61,6 @@ mongo users --eval "db.usertable.drop()"
 
 use users  // Make sure you're in the correct database
 db.customers.find().pretty()
+
+# references
+https://learn.arm.com/learning-paths/servers-and-cloud-computing/glibc-with-lse/mongo_benchmark/ 
