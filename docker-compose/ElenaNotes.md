@@ -1,9 +1,35 @@
 ~/ycsb-0.17.0/bin/ycsb.sh load mongodb -s -P ~/ycsb-0.17.0/workloads/iworkload -p recordcount=1000 -threads 8 -p mongodb.url="mongodb://docker-compose-carts-db-1:27017/mymongodb"
 
 
-# Target a specific database and collection
+# inside ycsb_interface
+# Target a specific database and add collection usertable (ycsb standard)
+# Load phase
+~/ycsb-0.17.0/bin/ycsb.sh load mongodb -s -P ~/ycsb-0.17.0/workloads/iworkload -p recordcount=1000 -p mongodb.url="mongodb://docker-compose-user-db-1:27017/users" -p mongodb.collection=usertable
+# Run workload A
+~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloada \
+  -p operationcount=1000 \
+  -p mongodb.url="mongodb://docker-compose-user-db-1:27017/users" \
+  -p mongodb.collection=usertable
+# Run workload B 
+~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloadb \
+  -p operationcount=1000 \
+  -p mongodb.url="mongodb://docker-compose-user-db-1:27017/users" \
+  -p mongodb.collection=usertable
+# Run workload E 
+~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloade \
+  -p operationcount=1000 \
+  -p mongodb.url="mongodb://docker-compose-user-db-1:27017/users" \
+  -p mongodb.collection=usertable
 
-~/ycsb-0.17.0/bin/ycsb.sh load mongodb -s -P ~/ycsb-0.17.0/workloads/iworkload -p recordcount=1000 -p mongodb.url="mongodb://docker-compose-user-db-1:27017/users" -p mongodb.collection=customers
+# inside docker-compose-users-db-1
+# look at new usertable
+mongo
+show dbs
+use users
+show collections
+db.usertable.find()
+# drop usertable
+mongo users --eval "db.usertable.drop()"
 
 
 
