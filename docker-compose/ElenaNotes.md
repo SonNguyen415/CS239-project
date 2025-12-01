@@ -2,17 +2,17 @@
 # Target a specific database and add collection usertable (ycsb standard)
 # Load phase (you can use workload a,b,e or iworkload interchangeably)
 ~/ycsb-0.17.0/bin/ycsb.sh load mongodb -s -P ~/ycsb-0.17.0/workloads/iworkload -p recordcount=1000 -p mongodb.url="mongodb://user-db:27017/users" -p mongodb.collection=usertable
-# Run workload A
+# Run workload A - copy from code not preview
 ~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloada \
   -p operationcount=1000 \
   -p mongodb.url="mongodb://user-db:27017/users" \
   -p mongodb.collection=usertable | tee -a /results/ycsb_output.txt
-# Run workload B 
+# Run workload B - copy from code not preview
 ~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloadb \
   -p operationcount=1000 \
   -p mongodb.url="mongodb://user-db:27017/users" \
   -p mongodb.collection=usertable | tee -a /results/ycsb_output.txt
-# Run workload E 
+# Run workload E - copy from code not preview
 ~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloade \
   -p operationcount=1000 \
   -p mongodb.url="mongodb://user-db:27017/users" \
