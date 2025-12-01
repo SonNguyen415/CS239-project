@@ -183,7 +183,8 @@ services:
       - microservices-net
   user-db:
     image: weaveworksdemos/user-db:0.4.0
-    hostname: user-db
+    # hostname: user-db
+    container_name: user-db
     restart: always
     # cap_drop:
     #   - all
@@ -207,17 +208,91 @@ services:
     command: "-d 60 -r 200 -c 2 -h edge-router"
     networks: # added
       - microservices-net
-  ycsb-interface: # added ycsb interface
-    image: ycsb:latest
+  # ycsb-interface: # added ycsb interface
+  #   image: ycsb:latest
+  #   container_name: ycsb_interface
+  #   stdin_open: true      # keep STDIN open
+  #   tty: true             # allocate a pseudo-TTY
+  #   command: /bin/bash    # override CMD if needed
+  #   networks: # added
+  #     - microservices-net
+
+  # Combined YCSB Interface + Exporter
+  ycsb-interface:
+    # build:
+    #   context: ./ycsb-combined
+    #   dockerfile: Dockerfile
+    image: ycsb-combined:latest
     container_name: ycsb_interface
-    stdin_open: true      # keep STDIN open
-    tty: true             # allocate a pseudo-TTY
-    command: /bin/bash    # override CMD if needed
-    networks: # added
+    stdin_open: true
+    tty: true
+    restart: always
+    ports:
+      - "8000:8000"  # Exporter metrics port
+    volumes:
+      - ycsb-results:/results
+    networks:
       - microservices-net
+    depends_on:
+      - user-db
+
+  # Prometheus for metrics collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - microservices-net
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - microservices-net
+    depends_on:
+      - prometheus
+
+  # YCSB Metrics Exporter (custom service to parse YCSB output)
+  # ycsb-exporter:
+  #   # build:
+  #   #   context: ./ycsb-exporter
+  #   #   dockerfile: Dockerfile
+  #   image: ycsb-exporter:latest
+  #   container_name: ycsb_exporter
+  #   restart: always
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - ycsb-results:/results
+  #   networks:
+  #     - microservices-net
 
 
 networks: # added docker network
   microservices-net:
     name: microservices-net
     driver: bridge
+
+volumes:
+  ycsb-results:
+  prometheus-data:
+  grafana-data:
