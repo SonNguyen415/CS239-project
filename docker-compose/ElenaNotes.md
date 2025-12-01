@@ -1,27 +1,24 @@
-~/ycsb-0.17.0/bin/ycsb.sh load mongodb -s -P ~/ycsb-0.17.0/workloads/iworkload -p recordcount=1000 -threads 8 -p mongodb.url="mongodb://docker-compose-carts-db-1:27017/mymongodb"
-
-
 # inside ycsb_interface
 # Target a specific database and add collection usertable (ycsb standard)
 # Load phase (you can use workload a,b,e or iworkload interchangeably)
-~/ycsb-0.17.0/bin/ycsb.sh load mongodb -s -P ~/ycsb-0.17.0/workloads/iworkload -p recordcount=1000 -p mongodb.url="mongodb://docker-compose-user-db-1:27017/users" -p mongodb.collection=usertable
+~/ycsb-0.17.0/bin/ycsb.sh load mongodb -s -P ~/ycsb-0.17.0/workloads/iworkload -p recordcount=1000 -p mongodb.url="mongodb://user-db:27017/users" -p mongodb.collection=usertable
 # Run workload A
 ~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloada \
   -p operationcount=1000 \
-  -p mongodb.url="mongodb://docker-compose-user-db-1:27017/users" \
-  -p mongodb.collection=usertable
+  -p mongodb.url="mongodb://user-db:27017/users" \
+  -p mongodb.collection=usertable | tee -a /results/ycsb_output.txt
 # Run workload B 
 ~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloadb \
   -p operationcount=1000 \
-  -p mongodb.url="mongodb://docker-compose-user-db-1:27017/users" \
-  -p mongodb.collection=usertable
+  -p mongodb.url="mongodb://user-db:27017/users" \
+  -p mongodb.collection=usertable | tee -a /results/ycsb_output.txt
 # Run workload E 
 ~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloade \
   -p operationcount=1000 \
-  -p mongodb.url="mongodb://docker-compose-user-db-1:27017/users" \
-  -p mongodb.collection=usertable
+  -p mongodb.url="mongodb://user-db:27017/users" \
+  -p mongodb.collection=usertable | tee -a /results/ycsb_output.txt
 
-# inside docker-compose-users-db-1
+# inside users-db (new name for docker-compose-db-1)
 # look at new usertable
 mongo \
 show dbs \
@@ -33,7 +30,7 @@ mongo users --eval "db.usertable.drop()"
 
 
 
-# This command worked kinda
+# This command worked kinda -deprecated
 ~/ycsb-0.17.0/bin/ycsb.sh load mongodb \
   -s \
   -P ~/ycsb-0.17.0/workloads/iworkload \
@@ -57,10 +54,10 @@ mongo users --eval "db.usertable.drop()"
 
 
   # Exec into container from terminal
-  docker exec -it docker-compose-user-db-1 /bin/bash 
+  docker exec -it user-db /bin/bash 
 
 use users  // Make sure you're in the correct database
-db.customers.find().pretty()
+db.usertable.find().pretty()
 
 # references
 https://learn.arm.com/learning-paths/servers-and-cloud-computing/glibc-with-lse/mongo_benchmark/ 
