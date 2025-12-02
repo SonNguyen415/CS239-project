@@ -29,11 +29,11 @@ spec:
         - -port=80
         resources:
           limits:
-            cpu: 200m
-            memory: 200Mi
-          requests:
             cpu: 100m
-            memory: 100Mi
+            memory: 128Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
         ports:
         - containerPort: 80
         securityContext:
@@ -77,18 +77,6 @@ spec:
   selector:
     name: catalogue
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: catalogue-db-pvc
-  namespace: sock-shop
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -120,10 +108,14 @@ spec:
         volumeMounts:
         - name: catalogue-db-storage
           mountPath: /var/lib/mysql
+        - name: tmp-volume              
+          mountPath: /tmp              
       volumes:
       - name: catalogue-db-storage
-        persistentVolumeClaim:
-          claimName: catalogue-db-pvc
+        emptyDir: {}
+      - name: tmp-volume           
+        emptyDir:
+          medium: Memory             
       nodeSelector:
         kubernetes.io/os: linux
 ---
@@ -164,11 +156,11 @@ spec:
         image: weaveworksdemos/user:0.4.7
         resources:
           limits:
-            cpu: 300m
-            memory: 200Mi
+            cpu: 200m
+            memory: 128Mi
           requests:
             cpu: 100m
-            memory: 100Mi
+            memory: 64Mi
         ports:
         - containerPort: 80
         env:
