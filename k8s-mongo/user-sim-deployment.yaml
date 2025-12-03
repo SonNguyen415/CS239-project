@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.37.0 (HEAD)
+  labels:
+    io.kompose.service: user-sim
+  name: user-sim
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: user-sim
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.37.0 (HEAD)
+      labels:
+        io.kompose.service: user-sim
+    spec:
+      containers:
+        - args:
+            - -d
+            - "60"
+            - -r
+            - "200"
+            - -c
+            - "2"
+            - -h
+            - edge-router
+          image: weaveworksdemos/load-test:0.1.1
+          name: user-sim
+          securityContext:
+            capabilities:
+              drop:
+                - all
+            readOnlyRootFilesystem: true
+      hostname: user-simulator
+      restartPolicy: Always

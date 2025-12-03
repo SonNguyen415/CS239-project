@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.37.0 (HEAD)
+  labels:
+    io.kompose.service: edge-router
+  name: edge-router
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: edge-router
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.37.0 (HEAD)
+      labels:
+        io.kompose.service: edge-router
+    spec:
+      containers:
+        - image: weaveworksdemos/edge-router:0.1.1
+          name: edge-router
+          ports:
+            - containerPort: 80
+              protocol: TCP
+            - containerPort: 8080
+              protocol: TCP
+          securityContext:
+            capabilities:
+              add:
+                - NET_BIND_SERVICE
+                - CHOWN
+                - SETGID
+                - SETUID
+                - DAC_OVERRIDE
+              drop:
+                - all
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - mountPath: /var/run
+              name: edge-router-tmpfs0
+      hostname: edge-router
+      restartPolicy: Always
+      volumes:
+        - emptyDir:
+            medium: Memory
+          name: edge-router-tmpfs0

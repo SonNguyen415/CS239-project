@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.37.0 (HEAD)
+  labels:
+    io.kompose.service: queue-master
+  name: queue-master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: queue-master
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.37.0 (HEAD)
+      labels:
+        io.kompose.service: queue-master
+    spec:
+      containers:
+        - image: weaveworksdemos/queue-master:0.3.1
+          name: queue-master
+          securityContext:
+            capabilities:
+              add:
+                - NET_BIND_SERVICE
+              drop:
+                - all
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - mountPath: /tmp
+              name: queue-master-tmpfs0
+      hostname: queue-master
+      restartPolicy: Always
+      volumes:
+        - emptyDir:
+            medium: Memory
+          name: queue-master-tmpfs0
