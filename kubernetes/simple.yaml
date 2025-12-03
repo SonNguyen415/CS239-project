@@ -206,19 +206,6 @@ spec:
     targetPort: 80
   selector:
     name: user
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: user-db-pvc
-  namespace: sock-shop
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -255,15 +242,14 @@ spec:
         volumeMounts:
         - mountPath: /tmp
           name: tmp-volume
-        - mountPath: /data/db
-          name: user-db-storage
+        - name: tmp-volume              
+          mountPath: /tmp  
       volumes:
         - name: tmp-volume
+          emptyDir: {}
+        - name: tmp-volume           
           emptyDir:
-            medium: Memory
-        - name: user-db-storage
-          persistentVolumeClaim:
-            claimName: user-db-pvc
+            medium: Memory 
       nodeSelector:
         kubernetes.io/os: linux
 ---
