@@ -104,18 +104,7 @@ spec:
             value: socksdb
         ports:
         - name: mysql
-          containerPort: 3306
-        volumeMounts:
-        - name: catalogue-db-storage
-          mountPath: /var/lib/mysql
-        - name: tmp-volume              
-          mountPath: /tmp              
-      volumes:
-      - name: catalogue-db-storage
-        emptyDir: {}
-      - name: tmp-volume           
-        emptyDir:
-          medium: Memory             
+          containerPort: 3306                    
       nodeSelector:
         kubernetes.io/os: linux
 ---
@@ -240,16 +229,14 @@ spec:
               - SETUID
           readOnlyRootFilesystem: true
         volumeMounts:
-        - mountPath: /tmp
-          name: tmp-volume
-        - name: tmp-volume              
-          mountPath: /tmp  
+        - name: tmp-volume
+          mountPath: /tmp
       volumes:
         - name: tmp-volume
-          emptyDir: {}
-        - name: tmp-volume           
           emptyDir:
-            medium: Memory 
+            medium: Memory
+        - name: user-db-storage
+          emptyDir: {}
       nodeSelector:
         kubernetes.io/os: linux
 ---
@@ -304,8 +291,8 @@ spec:
         - name: MONGO_PORT
           value: "27017"
         volumeMounts:
-        - mountPath: /tmp
-          name: tmp-volume
+        - name: tmp-volume 
+          mountPath: /tmp
       volumes:
         - name: tmp-volume
           emptyDir:
