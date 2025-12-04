@@ -15,6 +15,11 @@ DEPLOYMENT_FILES=(
     "k8s-mongo/ycsb-interface-deployment.yaml"
 )
 
+# Horizontal Pod Autoscalers
+HPA_FILES=(
+    "k8s-mongo/user-db-hpa.yaml"
+)
+
 # ConfigMaps
 CONFIGMAP_FILES=(
     "k8s-mongo/grafana-cm1-configmap.yaml"
@@ -46,6 +51,7 @@ apply_files() {
 apply_files "${PVC_FILES[@]}"
 apply_files "${CONFIGMAP_FILES[@]}"
 apply_files "${DEPLOYMENT_FILES[@]}"
+apply_files "${HPA_FILES[@]}"
 apply_files "${SERVICE_FILES[@]}"
 
 echo "Deployment complete."
