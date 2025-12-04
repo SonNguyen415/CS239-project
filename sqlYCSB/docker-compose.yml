@@ -208,7 +208,7 @@ services:
     networks: # added
       - microservices-net
   ycsb-interface: # added ycsb interface
-    image: ycsb:latest
+    image: gcr.io/sinuous-env-478221-k0/sqlycsb
     container_name: ycsb_interface
     stdin_open: true      # keep STDIN open
     tty: true             # allocate a pseudo-TTY
