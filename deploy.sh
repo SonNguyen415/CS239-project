@@ -5,6 +5,7 @@ PVC_FILES=(
     "k8s-mongo/grafana-data-persistentvolumeclaim.yaml"
     "k8s-mongo-prometheus/prometheus-persistentvolumeclaim.yaml"
     "k8s-mongo/ycsb-results-persistentvolumeclaim.yaml"
+    "k8s-mongo/user-db-pvc.yaml"
 )
 
 # Deployments
