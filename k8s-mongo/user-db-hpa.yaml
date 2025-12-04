@@ -6,7 +6,7 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: user-db-deployment
+    name: user-db  
   minReplicas: 1
   maxReplicas: 10
   metrics:
@@ -15,10 +15,31 @@ spec:
       name: cpu
       target:
         type: Utilization
-        averageUtilization: 25
+        averageUtilization: 35
   - type: Resource
     resource:
       name: memory
       target:
         type: Utilization
         averageUtilization: 50
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 30  # Wait 30s before scaling down (for testing)
+      policies:
+      - type: Percent
+        value: 50  # Can remove up to 50% of pods at once
+        periodSeconds: 15  # Every 15 seconds
+      - type: Pods
+        value: 2  # Or remove max 2 pods at once
+        periodSeconds: 15
+      selectPolicy: Max  # Use the more aggressive policy
+    scaleUp:
+      stabilizationWindowSeconds: 0  # Scale up immediately
+      policies:
+      - type: Percent
+        value: 100  # Can maximum double pods at once
+        periodSeconds: 15
+      - type: Pods
+        value: 4  
+        periodSeconds: 15
+      selectPolicy: Max
