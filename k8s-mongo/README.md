@@ -1,1 +1,40 @@
-See the [documentation](https://microservices-demo.github.io/deployment/docker-compose.html) on how to deploy Sock Shop using Docker Compose.
+# see what pods are running
+kubectl get pods
+
+# Connect to the YCSB pod 
+kubectl exec -it ycsb-interface-56cdb55444-vh7xm -- /bin/bash
+
+# Load phase 
+~/ycsb-0.17.0/bin/ycsb.sh load mongodb -s -P ~/ycsb-0.17.0/workloads/iworkload -p recordcount=100000 -p mongodb.url="mongodb://user-db:27017/users" -p mongodb.collection=usertable
+
+# Run workload A - quick example
+~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloada \ -p operationcount=1000 \ -p mongodb.url="mongodb://user-db:27017/users" \ -p mongodb.collection=usertable | tee -a /results/ycsb_output.txt 
+
+# Run workload B - quick example
+~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloadb \ -p operationcount=1000 \ -p mongodb.url="mongodb://user-db:27017/users" \ -p mongodb.collection=usertable | tee -a /results/ycsb_output.txt 
+
+# Run workload E - quick example
+~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloade \ -p operationcount=1000 \ -p mongodb.url="mongodb://user-db:27017/users" \ -p mongodb.collection=usertable | tee -a /results/ycsb_output.txt
+
+# Stress Test
+~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloada \ -p operationcount=50000 \  -p target=1000 \ -p mongodb.url="mongodb://user-db:27017/users" \ -p mongodb.collection=usertable | tee -a /results/ycsb_stress_test.txt
+
+# Spike test
+~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloada \ -p operationcount=10000 \ -p target=2000 \ -p mongodb.url="mongodb://user-db:27017/users" \ -p mongodb.collection=usertable | tee -a /results/ycsb_spike_peak.txt
+
+# Soak test
+~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloada \ -p operationcount=100000 \ -p target=200 \ -p mongodb.url="mongodb://user-db:27017/users" \ -p mongodb.collection=usertable | tee -a /results/ycsb_soak_test.txt
+
+# Exec into user-db and manipulate the database
+kubectl exec -it user-db-66fdf4f57b-l9rnn -- bash
+
+# enter the mongo database and look at new usertable
+mongo \
+show dbs \
+use users \
+show collections \
+db.usertable.find()
+
+# drop usertable
+mongo users --eval "db.usertable.drop()"
+
