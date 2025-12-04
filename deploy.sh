@@ -3,7 +3,7 @@
 # PersistentVolumeClaims
 PVC_FILES=(
     "k8s-mongo/grafana-data-persistentvolumeclaim.yaml"
-    "k8s-mongo-prometheus/prometheus-persistentvolumeclaim.yaml"
+    "k8s-mongo/prometheus-data-persistentvolumeclaim.yaml"
     "k8s-mongo/ycsb-results-persistentvolumeclaim.yaml"
     "k8s-mongo/user-db-pvc.yaml"
 )
@@ -11,7 +11,7 @@ PVC_FILES=(
 # Deployments
 DEPLOYMENT_FILES=(
     "k8s-mongo/grafana-deployment.yaml"
-    "k8s-mongo-prometheus/prometheus-deployment.yaml"
+    "k8s-mongo/prometheus-deployment.yaml"
     "k8s-mongo/user-db-deployment.yaml"
     "k8s-mongo/ycsb-interface-deployment.yaml"
 )
@@ -24,7 +24,7 @@ HPA_FILES=(
 # ConfigMaps
 CONFIGMAP_FILES=(
     "k8s-mongo/grafana-cm1-configmap.yaml"
-    "k8s-mongo-prometheus/prometheus-configmap.yaml"
+    "k8s-mongo/prometheus-cm0-configmap.yaml"
 )
 
 # Services

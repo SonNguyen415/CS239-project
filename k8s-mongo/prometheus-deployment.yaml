@@ -22,6 +22,17 @@ spec:
       labels:
         io.kompose.service: prometheus
     spec:
+      # Add initContainer to fix permissions
+      initContainers:
+      - name: fix-permissions
+        image: busybox
+        command: ["sh", "-c", "chown -R 65534:65534 /prometheus"]
+        volumeMounts:
+          - mountPath: /prometheus
+            name: prometheus-data
+      # fsGroup at pod level, not container level
+      securityContext:
+        fsGroup: 65534
       containers:
         - args:
             - --config.file=/etc/prometheus/prometheus.yml
