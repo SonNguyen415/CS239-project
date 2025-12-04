@@ -9,5 +9,9 @@ data:
       - name: Prometheus
         type: prometheus
         access: proxy
-        url: http://prometheus-service
+        url: http://prometheus:9090
+        jsonData:
+          httpMethod: POST
+          timeInterval: 5s
         isDefault: true
+        editable: true
