@@ -26,7 +26,7 @@ kubectl exec -it ycsb-interface-56cdb55444-vh7xm -- /bin/bash
 ~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloada \ -p operationcount=100000 \ -p target=200 \ -p mongodb.url="mongodb://user-db:27017/users" \ -p mongodb.collection=usertable | tee -a /results/ycsb_soak_test.txt
 
 # Exec into user-db and manipulate the database
-kubectl exec -it user-db-66fdf4f57b-l9rnn -- bash
+kubectl exec -it user-db-7f86694cb8-tzjgg  -- bash
 
 # enter the mongo database and look at new usertable
 mongo \
