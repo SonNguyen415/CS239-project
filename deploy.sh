@@ -1,29 +1,51 @@
 #!/bin/bash
-# List of YAML files to apply
-YAML_FILES=(
-    "k8s-mongo/grafana-cm1-configmap.yaml"
+
+# PersistentVolumeClaims
+PVC_FILES=(
     "k8s-mongo/grafana-data-persistentvolumeclaim.yaml"
-    "k8s-mongo/grafana-deployment.yaml"
-    "k8s-mongo/grafana-service.yaml"
-    "k8s-mongo-prometheus/prometheus-configmap.yaml"
     "k8s-mongo-prometheus/prometheus-persistentvolumeclaim.yaml"
-    "k8s-mongo-prometheus/prometheus-deployment.yaml"
-    "k8s-mongo-prometheus/prometheus-service.yaml"
-    "k8s-mongo/user-db-deployment.yaml"
-    "k8s-mongo/user-db-service.yaml"
     "k8s-mongo/ycsb-results-persistentvolumeclaim.yaml"
+)
+
+# Deployments
+DEPLOYMENT_FILES=(
+    "k8s-mongo/grafana-deployment.yaml"
+    "k8s-mongo-prometheus/prometheus-deployment.yaml"
+    "k8s-mongo/user-db-deployment.yaml"
     "k8s-mongo/ycsb-interface-deployment.yaml"
+)
+
+# ConfigMaps
+CONFIGMAP_FILES=(
+    "k8s-mongo/grafana-cm1-configmap.yaml"
+    "k8s-mongo-prometheus/prometheus-configmap.yaml"
+)
+
+# Services
+SERVICE_FILES=(
+    "k8s-mongo/grafana-service.yaml"
+    "k8s-mongo-prometheus/prometheus-service.yaml"
+    "k8s-mongo/user-db-service.yaml"
     "k8s-mongo/ycsb-interface-service.yaml"
 )
 
-# Loop over the files and apply them
-for file in "${YAML_FILES[@]}"; do
-  if [[ -f "$file" ]]; then
-    echo "Applying $file..."
-    kubectl apply -f "$file"
-  else
-    echo "Warning: $file does not exist, skipping."
-  fi
-done
+# Function to apply a list of files
+apply_files() {
+    local files=("$@")
+    for file in "${files[@]}"; do
+        if [[ -f "$file" ]]; then
+            echo "Applying $file..."
+            kubectl apply -f "$file"
+        else
+            echo "Warning: $file does not exist, skipping."
+        fi
+    done
+}
+
+# Apply in order
+apply_files "${PVC_FILES[@]}"
+apply_files "${CONFIGMAP_FILES[@]}"
+apply_files "${DEPLOYMENT_FILES[@]}"
+apply_files "${SERVICE_FILES[@]}"
 
 echo "Deployment complete."
