@@ -30,7 +30,7 @@ CONFIGMAP_FILES=(
 # Services
 SERVICE_FILES=(
     "k8s-mongo/grafana-service.yaml"
-    "k8s-mongo-prometheus/prometheus-service.yaml"
+    "k8s-mongo/prometheus-service.yaml"
     "k8s-mongo/user-db-service.yaml"
     "k8s-mongo/ycsb-interface-service.yaml"
 )
