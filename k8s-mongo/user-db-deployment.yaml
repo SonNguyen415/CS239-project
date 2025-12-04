@@ -34,10 +34,15 @@ spec:
               cpu: 500m
               memory: 512Mi
           volumeMounts:
+            - mountPath: /data/db
+              name: user-db-data
             - mountPath: /tmp
               name: user-db-tmpfs0
       restartPolicy: Always
       volumes:
+        - name: user-db-data
+          persistentVolumeClaim:
+            claimName: user-db-data
         - emptyDir:
             medium: Memory
           name: user-db-tmpfs0
