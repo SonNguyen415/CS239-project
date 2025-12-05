@@ -8,7 +8,7 @@ kubernetes/project.yaml
 To build and push YCSB image (if Dockerfile changes):
 ```sh
 docker build -t <artifact>/<project_id>/<image_name>:latest .
-docker push <artifact>/<project_id>/<image_name>:latest
+docker push <registry_path>/<image_name>:latest
 ```
 
 To run `iworkload`:

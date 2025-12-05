@@ -1,3 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: ycsb-results
+  name: ycsb-results
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,7 +36,7 @@ spec:
         io.kompose.service: ycsb-interface
     spec:
       containers:
-        - image: ycsb-combined:latest
+        - image: us-central1-docker.pkg.dev/sinuous-env-478221-k0/sock-shop/ycsb-combined:latest
           name: ycsb-interface
           ports:
             - containerPort: 8000
@@ -38,3 +51,20 @@ spec:
         - name: ycsb-results
           persistentVolumeClaim:
             claimName: ycsb-results
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.37.0 (HEAD)
+  labels:
+    io.kompose.service: ycsb-interface
+  name: ycsb-interface
+spec:
+  ports:
+    - name: "8000"
+      port: 8000
+      targetPort: 8000
+  selector:
+    io.kompose.service: ycsb-interface

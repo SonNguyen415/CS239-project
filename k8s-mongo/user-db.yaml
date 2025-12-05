@@ -1,0 +1,118 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: user-db-data
+  labels:
+    io.kompose.service: user-db
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi 
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.37.0 (HEAD)
+  labels:
+    io.kompose.service: user-db
+  name: user-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: user-db
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.37.0 (HEAD)
+      labels:
+        io.kompose.service: user-db
+    spec:
+      containers:
+        - image: weaveworksdemos/user-db:0.4.0
+          name: user-db
+          ports:
+            - containerPort: 27017
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 100m      
+              memory: 128Mi  
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /data/db
+              name: user-db-data
+            - mountPath: /tmp
+              name: user-db-tmpfs0
+      restartPolicy: Always
+      volumes:
+        - name: user-db-data
+          persistentVolumeClaim:
+            claimName: user-db-data
+        - emptyDir:
+            medium: Memory
+          name: user-db-tmpfs0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.37.0 (HEAD)
+  labels:
+    io.kompose.service: user-db
+  name: user-db
+spec:
+  ports:
+    - name: "27017"
+      port: 27017
+      targetPort: 27017
+  selector:
+    io.kompose.service: user-db
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: user-db-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: user-db  
+  minReplicas: 1
+  maxReplicas: 1
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 40
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 50
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 30  # Wait 30s before scaling down (for testing)
+      policies:
+      - type: Percent
+        value: 50  # Can remove up to 50% of pods at once
+        periodSeconds: 15  
+      selectPolicy: Max  # Use the more aggressive policy
+    scaleUp:
+      stabilizationWindowSeconds: 0  # Scale up immediately
+      policies:
+      - type: Percent
+        value: 100  # Can maximum double pods at once
+        periodSeconds: 15
+      selectPolicy: Max

@@ -1,3 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    use-subpath: "true"
+  labels:
+    io.kompose.service: prometheus
+  name: prometheus-cm0
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    scrape_configs:
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:9090']
+
+      - job_name: 'ycsb-exporter'
+        static_configs:
+          - targets: ['ycsb-interface:8000']
+        scrape_interval: 5s
+
+      - job_name: 'mongodb'
+        static_configs:
+          - targets: ['user-db:27017']
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: prometheus-data
+  name: prometheus-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -22,7 +63,6 @@ spec:
       labels:
         io.kompose.service: prometheus
     spec:
-      # Add initContainer to fix permissions
       initContainers:
       - name: fix-permissions
         image: busybox
@@ -30,7 +70,6 @@ spec:
         volumeMounts:
           - mountPath: /prometheus
             name: prometheus-data
-      # fsGroup at pod level, not container level
       securityContext:
         fsGroup: 65534
       containers:
@@ -59,3 +98,20 @@ spec:
         - name: prometheus-data
           persistentVolumeClaim:
             claimName: prometheus-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.37.0 (HEAD)
+  labels:
+    io.kompose.service: prometheus
+  name: prometheus
+spec:
+  ports:
+    - name: "9090"
+      port: 9090
+      targetPort: 9090
+  selector:
+    io.kompose.service: prometheus

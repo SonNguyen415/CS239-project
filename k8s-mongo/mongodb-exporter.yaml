@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb-exporter
+  template:
+    metadata:
+      labels:
+        app: mongodb-exporter
+    spec:
+      containers:
+      - name: mongodb-exporter
+        image: percona/mongodb-exporter:0.20.7
+        args:
+          - "--mongodb.uri=mongodb://user-db:27017"
+        ports:
+        - containerPort: 9216
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-exporter
+spec:
+  selector:
+    app: mongodb-exporter
+  ports:
+  - port: 9216
+    targetPort: 9216
