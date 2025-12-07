@@ -23,7 +23,7 @@ SCALE_UP_FACTOR = 1.5
 SCALE_DOWN_FACTOR = 0.8
 RESOURCE_LIMIT_FACTOR = 1.2
 
-# Resource bounds -- adjust as needed
+# Resource bounds -- maximum and minimum scaling limits
 MIN_CPU = "50m"
 MAX_CPU = "400m"
 MIN_MEMORY = "64Mi"
