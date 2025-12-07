@@ -88,9 +88,86 @@ RUN pip3 install prometheus-client==0.19.0 watchdog==3.0.0
 # Create results directory
 RUN mkdir -p /results
 
+# Load wrapper
+RUN printf '#!/bin/bash\n\
+RECORDCOUNT=100000\n\
+TARGET=200\n\
+OUTPUT=ycsb_output.txt\n\
+\n\
+while [ $# -gt 0 ]; do\n\
+  case "$1" in\n\
+    recordcount=*) RECORDCOUNT="${1#*=}" ;;\n\
+    target=*) TARGET="${1#*=}" ;;\n\
+    output=*) OUTPUT="${1#*=}" ;;\n\
+    *) echo "Unknown argument: $1"; exit 1 ;;\n\
+  esac\n\
+  shift\n\
+done\n\
+\n\
+~/ycsb-0.17.0/bin/ycsb.sh load mongodb -s \\\n\
+  -P ~/ycsb-0.17.0/workloads/iworkload \\\n\
+  -p recordcount="$RECORDCOUNT" \\\n\
+  -p target="$TARGET" \\\n\
+  -p mongodb.url="mongodb://user-db:27017/users" \\\n\
+  -p mongodb.collection=usertable 2>&1 | \\\n\
+  tee >(cat > /tmp/ycsb_pipe) /results/"$OUTPUT"\n' \
+  > /usr/local/bin/ycsb-load && chmod +x /usr/local/bin/ycsb-load
+
+# Run wrapper
+RUN printf '#!/bin/bash\n\
+WORKLOAD=workloada\n\
+OPCOUNT=50000\n\
+TARGET=1000\n\
+OUTPUT=ycsb_output.txt\n\
+\n\
+while [ $# -gt 0 ]; do\n\
+  case "$1" in\n\
+    workload=*) WORKLOAD="${1#*=}" ;;\n\
+    operationcount=*) OPCOUNT="${1#*=}" ;;\n\
+    target=*) TARGET="${1#*=}" ;;\n\
+    output=*) OUTPUT="${1#*=}" ;;\n\
+    *) echo "Unknown argument: $1"; exit 1 ;;\n\
+  esac\n\
+  shift\n\
+done\n\
+\n\
+~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s \\\n\
+  -P ~/ycsb-0.17.0/workloads/"$WORKLOAD" \\\n\
+  -p operationcount="$OPCOUNT" \\\n\
+  -p target="$TARGET" \\\n\
+  -p mongodb.url="mongodb://user-db:27017/users" \\\n\
+  -p mongodb.collection=usertable 2>&1 | \\\n\
+  tee >(cat > /tmp/ycsb_pipe) /results/"$OUTPUT"\n' \
+  > /usr/local/bin/ycsb-run && chmod +x /usr/local/bin/ycsb-run
+
+# Create a ycsb-help command
+RUN printf '#!/bin/bash\n\
+echo "=========================================="\n\
+echo "YCSB Interface"\n\
+echo "=========================================="\n\
+echo "Exporters: port 8000 (file), port 8001 (live)"\n\
+echo ""\n\
+echo "Commands:"\n\
+echo "  ycsb-load [recordcount=N] [target=N] [output=FILENAME]"\n\
+echo "  ycsb-run [workload=NAME] [operationcount=N] [target=N] [output=FILENAME]"\n\
+echo ""\n\
+echo "Examples:"\n\
+echo "  ycsb-load recordcount=100000 target=200"\n\
+echo "  ycsb-run workload=workloada operationcount=50000 target=1000 output=stress.txt"\n\
+echo ""\n\
+echo "Defaults:"\n\
+echo "  load: recordcount=100000, target=200, output=ycsb_output.txt"\n\
+echo "  run: workload=workloada, operationcount=50000, target=1000, output=ycsb_output.txt"\n\
+echo "=========================================="\n' \
+  > /usr/local/bin/ycsb-help && chmod +x /usr/local/bin/ycsb-help
+
 # Copy exporter script
 COPY exporter.py /usr/local/bin/exporter.py
 RUN chmod +x /usr/local/bin/exporter.py
+
+# Copy live exporter script
+COPY live-exporter.py /usr/local/bin/live-exporter.py
+RUN chmod +x /usr/local/bin/live-exporter.py
 
 # Copy startup script
 COPY start.sh /usr/local/bin/start.sh
@@ -100,6 +177,7 @@ WORKDIR /root/ycsb-0.17.0
 
 # Expose exporter port
 EXPOSE 8000
+EXPOSE 8001
 
 # Run startup script that launches both services
 CMD ["/usr/local/bin/start.sh"]

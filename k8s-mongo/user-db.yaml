@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: user-db-data
+  name: user-db-pvc
   labels:
     io.kompose.service: user-db
 spec:
@@ -21,7 +21,7 @@ metadata:
     io.kompose.service: user-db
   name: user-db
 spec:
-  replicas: 1
+  replicas: 1  # Keep at 1 for vertical scaling
   selector:
     matchLabels:
       io.kompose.service: user-db
@@ -30,9 +30,13 @@ spec:
       annotations:
         kompose.cmd: kompose convert
         kompose.version: 1.37.0 (HEAD)
+        prometheus.io/scrape: "true"  # Enable Prometheus scraping if needed
+        prometheus.io/port: "27017"
       labels:
         io.kompose.service: user-db
     spec:
+      nodeSelector:                    
+        workload-type: mongo  # Pin to specific node
       containers:
         - image: weaveworksdemos/user-db:0.4.0
           name: user-db
@@ -40,25 +44,21 @@ spec:
             - containerPort: 27017
               protocol: TCP
           resources:
+            # Starting resources - VPA will adjust these
             requests:
               cpu: 100m      
               memory: 128Mi  
             limits:
-              cpu: 500m
-              memory: 512Mi
+              cpu: 500m      # VPA will update this
+              memory: 512Mi  # VPA will update this
           volumeMounts:
             - mountPath: /data/db
-              name: user-db-data
-            - mountPath: /tmp
-              name: user-db-tmpfs0
+              name: user-db-pvc
       restartPolicy: Always
       volumes:
-        - name: user-db-data
+        - name: user-db-pvc
           persistentVolumeClaim:
-            claimName: user-db-data
-        - emptyDir:
-            medium: Memory
-          name: user-db-tmpfs0
+            claimName: user-db-pvc
 ---
 apiVersion: v1
 kind: Service
@@ -77,42 +77,21 @@ spec:
   selector:
     io.kompose.service: user-db
 ---
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
+# Configuration for your custom latency-based VPA
+# This is a ConfigMap to store VPA settings
+apiVersion: v1
+kind: ConfigMap
 metadata:
-  name: user-db-hpa
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: user-db  
-  minReplicas: 1
-  maxReplicas: 1
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 40
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 50
-  behavior:
-    scaleDown:
-      stabilizationWindowSeconds: 30  # Wait 30s before scaling down (for testing)
-      policies:
-      - type: Percent
-        value: 50  # Can remove up to 50% of pods at once
-        periodSeconds: 15  
-      selectPolicy: Max  # Use the more aggressive policy
-    scaleUp:
-      stabilizationWindowSeconds: 0  # Scale up immediately
-      policies:
-      - type: Percent
-        value: 100  # Can maximum double pods at once
-        periodSeconds: 15
-      selectPolicy: Max
+  name: user-db-vpa-config
+data:
+  deployment_name: "user-db"
+  container_name: "user-db"
+  target_latency_ms: "200"
+  scale_up_threshold_ms: "300"
+  scale_down_threshold_ms: "100"
+  min_cpu: "100m"
+  max_cpu: "4000m"
+  min_memory: "128Mi"
+  max_memory: "4Gi"
+  check_interval_seconds: "30"
+  cooldown_period_seconds: "300"

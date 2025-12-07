@@ -1,16 +1,24 @@
 #!/bin/bash
 
 # Start the YCSB exporter in the background
-echo "Starting YCSB Prometheus Exporter..."
 python3 /usr/local/bin/exporter.py &
 
-# Wait a moment for the exporter to start
+# Create the named pipe
+if [ ! -p /tmp/ycsb_pipe ]; then
+  mkfifo /tmp/ycsb_pipe
+fi
+
+# Keep the pipe open with a background process that feeds it nothing
+# This prevents the pipe from closing
+tail -f /dev/null > /tmp/ycsb_pipe &
+
+# Start the live exporter reading from the pipe
+python3 /usr/local/bin/live-exporter.py < /tmp/ycsb_pipe &
+
+# Wait a moment for exporters to start
 sleep 2
 
-# Start an interactive bash shell
-echo "YCSB Interface Ready. Exporter running on port 8000."
-echo "Run your YCSB benchmarks with: ~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloada ..."
-echo ""
+echo "YCSB exporters started."
 
 # Keep container running with interactive bash
 exec /bin/bash

@@ -22,6 +22,11 @@ data:
           - targets: ['ycsb-interface:8000']
         scrape_interval: 5s
 
+      - job_name: 'ycsb-live-exporter'
+        static_configs:
+          - targets: ['ycsb-interface:8001']
+        scrape_interval: 2s
+
       - job_name: 'mongodb'
         static_configs:
           - targets: ['user-db:27017']
@@ -64,7 +69,7 @@ spec:
         io.kompose.service: prometheus
     spec:
       initContainers:
-      - name: fix-permissions
+      - name: fix-permissionsf
         image: busybox
         command: ["sh", "-c", "chown -R 65534:65534 /prometheus"]
         volumeMounts:
