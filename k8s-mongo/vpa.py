@@ -21,6 +21,7 @@ POLICY_MAX = False
 # Scaling factors - set by policy / arguments
 SCALE_UP_FACTOR = 1.5
 SCALE_DOWN_FACTOR = 0.8
+RESOURCE_LIMIT_FACTOR = 1.2
 
 # Resource bounds - this doesn't matter will be set  
 MIN_CPU = "50m"
@@ -149,8 +150,8 @@ class LatencyBasedVPA:
                 if container.name == container_name:
                     container.resources.requests['cpu'] = self._format_cpu(new_cpu)
                     container.resources.requests['memory'] = self._format_memory(new_memory)
-                    container.resources.limits['cpu'] = self._format_cpu(new_cpu * 1.2)
-                    container.resources.limits['memory'] = self._format_memory(new_memory * 1.2)
+                    container.resources.limits['cpu'] = self._format_cpu(new_cpu * RESOURCE_LIMIT_FACTOR)
+                    container.resources.limits['memory'] = self._format_memory(new_memory * RESOURCE_LIMIT_FACTOR)
                     updated = True
                     break
             
