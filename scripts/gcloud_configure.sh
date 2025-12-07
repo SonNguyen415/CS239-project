@@ -1,18 +1,12 @@
 #!/bin/bash
 set -e
 
-PROJECT_ID="$1"
-
-if [ -z "$PROJECT_ID" ]; then
-    echo "Usage: $0 <project_id>"
-    exit 1
-fi
+CLUSTER_NAME="$1"
 
 # -----------------------------
 # CONSTANT CONFIG
 # -----------------------------
 REGION="us-central1"
-CLUSTER_NAME="my-gke-cluster"
 REPO_NAME="sockshop"
 # -----------------------------
 
@@ -22,8 +16,15 @@ gcloud init
 echo "Logging in user..."
 gcloud auth login
 
-echo "Setting project to: $PROJECT_ID"
-gcloud config set project "$PROJECT_ID"
+# Get the current project ID (auto-detected after login)
+PROJECT_ID=$(gcloud config get-value project)
+
+if [ -z "$PROJECT_ID" ]; then
+    echo "Error: No project ID found. Please select a project during 'gcloud init'."
+    exit 1
+fi
+
+echo "Using project: $PROJECT_ID"
 
 echo "Installing GKE auth plugin..."
 gcloud components install gke-gcloud-auth-plugin -q
@@ -32,9 +33,8 @@ gcloud components install gke-gcloud-auth-plugin -q
 # Create GKE Autopilot cluster
 # -----------------------------
 echo "Creating GKE Autopilot cluster '$CLUSTER_NAME' in $REGION..."
-gcloud container clusters create "$CLUSTER_NAME" \
+gcloud container clusters create-auto "$CLUSTER_NAME" \
   --region "$REGION" \
-  --autopilot \
   --release-channel "regular"
 
 echo "Fetching cluster credentials..."
@@ -62,7 +62,10 @@ gcloud auth configure-docker "${REGION}-docker.pkg.dev"
 # -----------------------------
 # Run build script
 # -----------------------------
-if [ -f "./build.sh" ]; then
+if [ -f "$(dirname "$0")/build.sh" ]; then
+    echo "Running build.sh with REPO_BASE argument..."
+    "$(dirname "$0")/build.sh" "$REPO_BASE"
+elif [ -f "./build.sh" ]; then
     echo "Running build.sh with REPO_BASE argument..."
     ./build.sh "$REPO_BASE"
 else
@@ -70,3 +73,5 @@ else
 fi
 
 echo "Gcloud + GKE Autopilot + Artifact Registry setup complete!"
+echo "Project ID: ${PROJECT_ID}"
+echo "Repository: ${REPO_BASE}"
