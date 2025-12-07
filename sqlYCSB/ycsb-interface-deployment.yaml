@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.37.0 (HEAD)
+  labels:
+    io.kompose.service: mysql-ycsb-interface
+  name: mysql-ycsb-interface
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: mysql-ycsb-interface
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.37.0 (HEAD)
+      labels:
+        io.kompose.service: mysql-ycsb-interface
+    spec:
+      containers:
+        - args:
+            - /bin/bash
+          image: us-central1-docker.pkg.dev/sinuous-env-478221-k0/sock-shop/mysql-ycsb:latest
+          name: mysql-ycsb-interface
+          ports:
+            - containerPort: 3306
+              protocol: TCP
+          stdin: true
+          tty: true
+      restartPolicy: Always
