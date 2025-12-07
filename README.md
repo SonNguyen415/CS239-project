@@ -44,3 +44,17 @@ chmod +x sss_mongo_ycsb_benchmark.sh
 ```
 ./sss_mongo_ycsb_benchmark.sh
 ```
+
+## To Run the MySQL benchmarks
+###Download scripts
+```sh
+curl -o mysql_ycsb_benchmark.sh https://raw.githubusercontent.com/SonNguyen415/CS239-project/main/scripts/mysql_ycsb_benchmark.sh
+curl -o sss_mysql_ycsb_benchmark.sh https://raw.githubusercontent.com/SonNguyen415/CS239-project/main/scripts/sss_mysql_ycsb_benchmark.sh
+```
+
+### Make them executable and Run
+```
+chmod +x mysql_ycsb_benchmark.sh
+chmod +x sss_mysql_ycsb_benchmark.sh
+```
+
