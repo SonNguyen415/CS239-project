@@ -57,7 +57,6 @@ grafana:
 # -----------------------------
 # Help
 # -----------------------------
-.PHONY: help
 help:
 	@echo "Usage:"
 	@echo "  make PROJECT_ID=<project> REPO_BASE=<repo> ARCH=<arch>         # Configure, build, and deploy (assumes gcloud installed)"
