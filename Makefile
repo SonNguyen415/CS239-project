@@ -15,6 +15,7 @@ GCLOUD_CONFIGURE_STANDARD=$(SCRIPTS_DIR)/gcloud_configure_standard.sh
 BUILD=$(SCRIPTS_DIR)/build.sh
 DEPLOY=$(SCRIPTS_DIR)/deploy.sh
 DELETE=$(SCRIPTS_DIR)/delete.sh
+MONGO_BENCHMARK=$(SCRIPTS_DIR)/mongo_benchmark.sh
 
 # -----------------------------
 # Default target -- assumed that gcloud is already installed
@@ -54,20 +55,27 @@ delete:
 grafana:
 	@kubectl port-forward svc/grafana 3000:80
 
+prometheus:
+	@kubectl port-forward svc/prometheus 9090:9090
+
+mongo_benchmark:
+	@$(MONGO_BENCHMARK)
+
 # -----------------------------
 # Help
 # -----------------------------
 help:
 	@echo "Usage:"
-	@echo "  make PROJECT_ID=<project> REPO_BASE=<repo> ARCH=<arch>         # Configure, build, and deploy (assumes gcloud installed)"
-	@echo "  make all PROJECT_ID=<project> REPO_BASE=<repo> ARCH=<arch>    	# Install gcloud + everything"
-	@echo "  make install ARCH=<arch>                                       # Install gcloud SDK"
-	@echo "  make configure PROJECT_ID=<project>                            # Configure gcloud, GKE, Artifact Registry, and build images"
-	@echo "  make build REPO_BASE=<repo>                                    # Build Docker images"
-	@echo "  make deploy                                                    # Deploy to GKE without VPA"
-	@echo "  make deploy_vpa                                                # Deploy to GKE with VPA"
-	@echo "  make grafana                                                  	# Port-forward Grafana service to localhost:3000"
-	@echo "  make delete                                                 	# Delete deployment from GKE"
-	@echo "  make help                                                      # Show this help message"
+	@echo "  make PROJECT_ID=<project> REPO_BASE=<repo> ARCH=<arch>      # Configure, build, and deploy (assumes gcloud installed)"
+	@echo "  make all PROJECT_ID=<project> REPO_BASE=<repo> ARCH=<arch>  # Install gcloud + everything"
+	@echo "  make install ARCH=<arch>                                    # Install gcloud SDK"
+	@echo "  make configure PROJECT_ID=<project>                         # Configure gcloud, GKE, Artifact Registry, and build images"
+	@echo "  make build REPO_BASE=<repo>                                 # Build Docker images"
+	@echo "  make deploy                                                 # Deploy to GKE without VPA"
+	@echo "  make deploy_vpa                                             # Deploy to GKE with VPA"
+	@echo "  make grafana                                                # Port-forward Grafana service to localhost:3000"
+	@echo "  make delete                                                 # Delete deployment from GKE"
+	@echo "  make mongo_benchmark                                        # Run MongoDB YCSB benchmark"
+	@echo "  make help                                                   # Show this help message"
 
-.PHONY: default all install configure build deploy deploy_vpa delete help
+.PHONY: default all install configure build deploy deploy_vpa delete mongo_benchmark help

@@ -36,7 +36,7 @@ spec:
         io.kompose.service: ycsb-interface
     spec:
       containers:
-        - image: us-central1-docker.pkg.dev/sinuous-env-478221-k0/sock-shop/ycsb-new:v21
+        - image: us-central1-docker.pkg.dev/sinuous-env-478221-k0/sock-shop/ycsb-new:v22
           name: ycsb-interface
           ports:
             - containerPort: 8000

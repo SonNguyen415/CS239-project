@@ -93,25 +93,30 @@ RUN printf '#!/bin/bash\n\
 RECORDCOUNT=100000\n\
 TARGET=200\n\
 OUTPUT=ycsb_output.txt\n\
+URL="mongodb://user-db:27017/users"\n\
+COLLECTION="usertable"\n\
+UPSERT=false\n\
 \n\
 while [ $# -gt 0 ]; do\n\
   case "$1" in\n\
     recordcount=*) RECORDCOUNT="${1#*=}" ;;\n\
     target=*) TARGET="${1#*=}" ;;\n\
     output=*) OUTPUT="${1#*=}" ;;\n\
+    url=*) URL="${1#*=}" ;;\n\
+    collection=*) COLLECTION="${1#*=}" ;;\n\
+    upsert=*) UPSERT="${1#*=}" ;;\n\
     *) echo "Unknown argument: $1"; exit 1 ;;\n\
   esac\n\
   shift\n\
 done\n\
 \n\
-~/ycsb-0.17.0/bin/ycsb.sh load mongodb -s \\\n\
-  -P ~/ycsb-0.17.0/workloads/iworkload \\\n\
-  -p recordcount="$RECORDCOUNT" \\\n\
-  -p target="$TARGET" \\\n\
-  -p mongodb.url="mongodb://user-db:27017/users" \\\n\
-  -p mongodb.collection=usertable 2>&1 | \\\n\
-  tee >(cat > /tmp/ycsb_pipe) /results/"$OUTPUT"\n' \
-  > /usr/local/bin/ycsb-load && chmod +x /usr/local/bin/ycsb-load
+PARAMS="-p recordcount=$RECORDCOUNT -p target=$TARGET -p mongodb.url=$URL -p mongodb.collection=$COLLECTION"\n\
+if [ "$UPSERT" = "true" ]; then\n\
+    PARAMS="$PARAMS -p mongodb.upsert=true"\n\
+fi\n\
+\n\
+~/ycsb-0.17.0/bin/ycsb.sh load mongodb -s -P ~/ycsb-0.17.0/workloads/iworkload $PARAMS 2>&1 | tee >(cat > /tmp/ycsb_pipe) /results/$OUTPUT\n' \
+> /usr/local/bin/ycsb-load && chmod +x /usr/local/bin/ycsb-load
 
 # Run wrapper
 RUN printf '#!/bin/bash\n\
@@ -119,6 +124,9 @@ WORKLOAD=workloada\n\
 OPCOUNT=50000\n\
 TARGET=1000\n\
 OUTPUT=ycsb_output.txt\n\
+URL="mongodb://user-db:27017/users"\n\
+COLLECTION="usertable"\n\
+UPSERT=false\n\
 \n\
 while [ $# -gt 0 ]; do\n\
   case "$1" in\n\
@@ -126,19 +134,21 @@ while [ $# -gt 0 ]; do\n\
     operationcount=*) OPCOUNT="${1#*=}" ;;\n\
     target=*) TARGET="${1#*=}" ;;\n\
     output=*) OUTPUT="${1#*=}" ;;\n\
+    url=*) URL="${1#*=}" ;;\n\
+    collection=*) COLLECTION="${1#*=}" ;;\n\
+    upsert=*) UPSERT="${1#*=}" ;;\n\
     *) echo "Unknown argument: $1"; exit 1 ;;\n\
   esac\n\
   shift\n\
 done\n\
 \n\
-~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s \\\n\
-  -P ~/ycsb-0.17.0/workloads/"$WORKLOAD" \\\n\
-  -p operationcount="$OPCOUNT" \\\n\
-  -p target="$TARGET" \\\n\
-  -p mongodb.url="mongodb://user-db:27017/users" \\\n\
-  -p mongodb.collection=usertable 2>&1 | \\\n\
-  tee >(cat > /tmp/ycsb_pipe) /results/"$OUTPUT"\n' \
-  > /usr/local/bin/ycsb-run && chmod +x /usr/local/bin/ycsb-run
+PARAMS="-p operationcount=$OPCOUNT -p target=$TARGET -p mongodb.url=$URL -p mongodb.collection=$COLLECTION"\n\
+if [ "$UPSERT" = "true" ]; then\n\
+    PARAMS="$PARAMS -p mongodb.upsert=true"\n\
+fi\n\
+\n\
+~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/$WORKLOAD $PARAMS 2>&1 | tee >(cat > /tmp/ycsb_pipe) /results/$OUTPUT\n' \
+> /usr/local/bin/ycsb-run && chmod +x /usr/local/bin/ycsb-run
 
 # Create a ycsb-help command
 RUN printf '#!/bin/bash\n\
@@ -148,16 +158,14 @@ echo "=========================================="\n\
 echo "Exporters: port 8000 (file), port 8001 (live)"\n\
 echo ""\n\
 echo "Commands:"\n\
-echo "  ycsb-load [recordcount=N] [target=N] [output=FILENAME]"\n\
-echo "  ycsb-run [workload=NAME] [operationcount=N] [target=N] [output=FILENAME]"\n\
+echo "  ycsb-load [recordcount=N] [target=N] [output=FILENAME] [url=<mongodb_url>] [collection=<name>] [upsert=true|false]"\n\
+echo "  ycsb-run [workload=NAME] [operationcount=N] [target=N] [output=FILENAME] [url=<mongodb_url>] [collection=<name>] [upsert=true|false]"\n\
 echo ""\n\
 echo "Examples:"\n\
 echo "  ycsb-load recordcount=100000 target=200"\n\
+echo "  ycsb-load recordcount=50000 url=\"mongodb://mongo:27017/users\" collection=testtable upsert=true"\n\
 echo "  ycsb-run workload=workloada operationcount=50000 target=1000 output=stress.txt"\n\
-echo ""\n\
-echo "Defaults:"\n\
-echo "  load: recordcount=100000, target=200, output=ycsb_output.txt"\n\
-echo "  run: workload=workloada, operationcount=50000, target=1000, output=ycsb_output.txt"\n\
+echo "  ycsb-run workload=workloada operationcount=10000 url=\"mongodb://mongo:27017/users\" collection=testtable upsert=true"\n\
 echo "=========================================="\n' \
   > /usr/local/bin/ycsb-help && chmod +x /usr/local/bin/ycsb-help
 
