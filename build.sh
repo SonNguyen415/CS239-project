@@ -1,25 +1,48 @@
 #!/bin/bash
+set -e
 
-TAG="$1"
-if [ -z "$TAG" ]; then
-    echo "Error: You must specify a tag (e.g., v1)"
-    echo "Usage: $0 <tag>"
+# -----------------------------
+# Arguments
+# -----------------------------
+REPO_BASE="$1"
+
+if [ -z "$REPO_BASE" ]; then
+    echo "Usage: $0 <repo_base>"
     exit 1
 fi
 
-IMAGE_NAME="ycsb-new"
-REPO="us-central1-docker.pkg.dev/sinuous-env-478221-k0/sock-shop/${IMAGE_NAME}:${TAG}"
-YAML_FILE="k8s-mongo/ycsb.yaml"
+# -----------------------------
+# Constants: define images to build
+# Format: "IMAGE_NAME:BUILD_DIR:YAML_FILE"
+# -----------------------------
+IMAGES=(
+  "ycsb-new:k8s-mongo/ycsb-combined/:k8s-mongo/ycsb.yaml"
+  "sqlYCSB:sqlYCSB/:sqlYCSB/sql-ycsb-compose.yaml"
+)
 FLAGS="-t"
+# -----------------------------
 
-# Build
-docker build $FLAGS "${IMAGE_NAME}" k8s-mongo/ycsb-combined/
-docker tag "${IMAGE_NAME}:latest" "${REPO}"
-docker push "${REPO}"
-echo "Successfully pushed ${REPO}"
+# The tag will be commit hash + timestamp
+COMMIT_TAG="$(git rev-parse --short HEAD)-$(date +%s)"
 
-# Update YAML
-sed -i "s#ycsb-new:.*#ycsb-new:${TAG}#g" "$YAML_FILE"
-echo "Updated $YAML_FILE to use image tag: ${TAG}"
+for entry in "${IMAGES[@]}"; do
+    IFS=":" read -r IMAGE_NAME BUILD_DIR YAML_FILE <<< "$entry"
 
-./deploy.sh
+    REPO="${REPO_BASE}/${IMAGE_NAME}:${COMMIT_TAG}"
+    echo "Building Docker image '${IMAGE_NAME}' from '${BUILD_DIR}' with tag '${COMMIT_TAG}'..."
+
+    docker build $FLAGS "${IMAGE_NAME}" "$BUILD_DIR"
+    docker tag "${IMAGE_NAME}:latest" "${REPO}"
+    docker push "${REPO}"
+    echo "Successfully pushed ${REPO}"
+
+    # Replace the tag in YAML - macOS and Linux compatible
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        sed -i '' "s|<repo>/<project_id>/<repo_name>/<image_name>:<tag>|${REPO}|g; s|${REPO_BASE}/${IMAGE_NAME}:[^[:space:]]*|${REPO}|g" "$YAML_FILE"
+    else
+        sed -i "s|<repo>/<project_id>/<repo_name>/<image_name>:<tag>|${REPO}|g; s|${REPO_BASE}/${IMAGE_NAME}:[^[:space:]]*|${REPO}|g" "$YAML_FILE"
+    fi
+        
+    echo "Updated $YAML_FILE with image path: ${REPO}"
+done
+

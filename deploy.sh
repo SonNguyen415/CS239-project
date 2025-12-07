@@ -12,7 +12,6 @@ FILES=(
     "sqlYCSB/ycsb-interface-deployment.yaml"
 )
 
-
 # Function to apply a list of files
 apply_files() {
     local files=("$@")
