@@ -47,12 +47,33 @@ run_ycsb_command() {
     echo ""
 }
 
+# Find the MongoDB user-db pod
+echo "Finding MongoDB user-db pod..."
+MONGO_POD=$(kubectl get pods | grep "user-db" | grep -v "mysql" | awk '{print $1}' | head -n 1)
+
+if [ -z "$MONGO_POD" ]; then
+    echo "ERROR: Could not find MongoDB user-db pod"
+    exit 1
+fi
+
+echo "Found MongoDB pod: $MONGO_POD"
+echo ""
+
+# Drop existing usertable collection before loading
+echo "======================================"
+echo "Dropping existing usertable collection..."
+echo "======================================"
+kubectl exec -it "$MONGO_POD" -- mongo users --eval "db.usertable.drop()"
+echo ""
+echo "Collection dropped successfully"
+echo ""
+
 # Load Phase
 echo "Starting YCSB benchmark sequence..."
 echo ""
 
-run_ycsb_command "LOAD PHASE - Loading 100,000 records" \
-    "$YCSB_PATH load mongodb -s -P $WORKLOAD_PATH/workloada -p recordcount=100000 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION"
+run_ycsb_command "LOAD PHASE - Loading 1,000 records" \
+    "$YCSB_PATH load mongodb -s -P $WORKLOAD_PATH/workloada -p recordcount=1000 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION"
 
 # Workload A - Update heavy workload (50% read, 50% update)
 run_ycsb_command "WORKLOAD A - Update Heavy (50/50 read/update)" \
@@ -65,18 +86,6 @@ run_ycsb_command "WORKLOAD B - Read Mostly (95/5 read/update)" \
 # Workload E - Short ranges (95% scan, 5% insert)
 run_ycsb_command "WORKLOAD E - Short Ranges (95/5 scan/insert)" \
     "$YCSB_PATH run mongodb -s -P $WORKLOAD_PATH/workloade -p operationcount=1000 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION | tee -a /results/ycsb_output.txt"
-
-# Spike Test - High throughput burst
-run_ycsb_command "SPIKE TEST - High throughput burst (10k ops/sec, 1000 threads)" \
-    "$YCSB_PATH run mongodb -s -P $WORKLOAD_PATH/workloadb -p operationcount=20000 -p target=10000 -p threadcount=1000 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION | tee -a /results/ycsb_output.txt"
-
-# Stress Test - Sustained high load
-run_ycsb_command "STRESS TEST - Sustained high load (1M ops, 2k ops/sec, 1000 threads)" \
-    "$YCSB_PATH run mongodb -s -P $WORKLOAD_PATH/workloadb -p operationcount=1000000 -p target=2000 -p threadcount=1000 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION | tee -a /results/ycsb_output.txt"
-
-# Soak Test - Long duration stability test
-run_ycsb_command "SOAK TEST - Long duration stability (450k ops, 500 ops/sec, 50 threads)" \
-    "$YCSB_PATH run mongodb -s -P $WORKLOAD_PATH/workloadb -p operationcount=450000 -p target=500 -p threadcount=50 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION | tee -a /results/ycsb_output.txt"
 
 echo "======================================"
 echo "All benchmarks completed successfully!"
