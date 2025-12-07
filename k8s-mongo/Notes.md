@@ -16,14 +16,23 @@ kubectl exec -it ycsb-interface-56cdb55444-vh7xm -- /bin/bash
 # Run workload E - quick example
 ~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloade \ -p operationcount=1000 \ -p mongodb.url="mongodb://user-db:27017/users" \ -p mongodb.collection=usertable | tee -a /results/ycsb_output.txt
 
-# peak Test
-~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloada \ -p operationcount=50000 \  -p target=1000 \ -p mongodb.url="mongodb://user-db:27017/users" \ -p mongodb.collection=usertable | tee -a /results/ycsb_stress_test.txt
+# spike Test
+~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloadb \
+  -p operationcount=20000 \      # Shorter
+  -p target=10000 \              # Higher throughput
+  -p threadcount=1000 \          # Max threads
+  -p mongodb.url="mongodb://user-db:27017/users"
 
-# streess test
+# stress test
 ~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloadb \ -p operationcount=1000000 \ -p target=2000 \ -p mongodb.url="mongodb://user-db:27017/users" \ -p mongodb.collection=usertable \ -p threadcount=1000
 
 # Soak test
-~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloada \ -p operationcount=100000 \ -p target=200 \ -p mongodb.url="mongodb://user-db:27017/users" \ -p mongodb.collection=usertable | tee -a /results/ycsb_soak_test.txt
+~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloadb \
+  -p operationcount=450000 \
+  -p target=500 \
+  -p threadcount=50 \
+  -p mongodb.url="mongodb://user-db:27017/users" \
+  -p mongodb.collection=usertable
 
 # Exec into user-db and manipulate the database
 kubectl exec -it user-db-7f86694cb8-tzjgg  -- bash
