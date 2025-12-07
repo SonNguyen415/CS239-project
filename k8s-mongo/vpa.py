@@ -9,14 +9,18 @@ import logging
 import requests
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
+from enum import Enum
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+class ScalingPolicy(Enum):
+    P90 = "max(ycsb_live_op_p90_us)"
+    AVG = "sum(ycsb_live_op_avg_us * ycsb_live_op_count) / sum(ycsb_live_op_count)"
+    MAX = "max(ycsb_live_op_max_us)"
 
-# Scaling policies - set ONE of these to True
-POLICY_P90 = False
-POLICY_AVG = True
-POLICY_MAX = False
+    @property
+    def prom_query(self):
+        return self.value
 
 # Scaling factors - set by policy / arguments
 SCALE_UP_FACTOR = 1.5
@@ -43,6 +47,8 @@ class LatencyBasedVPA:
         self.namespace = namespace
         self.check_interval = check_interval
         self.prometheus_url = prometheus_url.rstrip('/')
+
+        self.policy = ScalingPolicy.MAX # Default policy
         
         # Latency thresholds (microseconds)
         self.scale_up_threshold = 2000  # 2ms in us
@@ -66,21 +72,29 @@ class LatencyBasedVPA:
     
     def get_latency_metric(self, deployment_name):
         """Get latency in microseconds from YCSB metrics - monitors ALL operations"""
-        # YCSB metrics are already in microseconds
-        if POLICY_P90:
-            query = 'max(ycsb_live_op_p90_us)'
-            metric_name = "p90_all_ops"
-        elif POLICY_AVG:
-            query = 'sum(ycsb_live_op_avg_us * ycsb_live_op_count) / sum(ycsb_live_op_count)'
-            metric_name = "avg_all_ops"
-        elif POLICY_MAX:
-            query = 'max(ycsb_live_op_max_us)'
-            metric_name = "max_all_ops"
-        else:
-            raise ValueError("No policy enabled")
-        
+
+        QUERY_MAP = {
+            ScalingPolicy.P90: (
+                "max(ycsb_live_op_p90_us)",
+                "p90_all_ops",
+            ),
+            ScalingPolicy.AVG: (
+                "sum(ycsb_live_op_avg_us * ycsb_live_op_count) / sum(ycsb_live_op_count)",
+                "avg_all_ops",
+            ),
+            ScalingPolicy.MAX: (
+                "max(ycsb_live_op_max_us)",
+                "max_all_ops",
+            ),
+        }
+
+        if self.policy not in QUERY_MAP:
+            raise ValueError(f"Unsupported scaling policy: {self.policy}")
+
+        query, metric_name = QUERY_MAP[self.policy]
         value = self.query_prometheus(query)
         return (value, metric_name) if value is not None else (None, None)
+
     
     def _parse_cpu(self, cpu_str):
         """Parse CPU string to millicores"""
@@ -188,9 +202,6 @@ class LatencyBasedVPA:
             return None, None
     
     def monitor_and_scale(self, deployment_name, container_name):
-        policy = "p90" if POLICY_P90 else "avg" if POLICY_AVG else "max"
-        logger.info(f"Starting VPA for {deployment_name}, monitoring ALL operations, policy={policy}")
-        
         while True:
             try:
                 logger.info(f"\n{'='*60}")
@@ -236,6 +247,7 @@ if __name__ == "__main__":
     parser.add_argument('--prometheus-url', required=True)
     parser.add_argument('--deployment', required=True)
     parser.add_argument('--container', required=True)
+    parser.add_argument('--policy', choices=['p90', 'avg', 'max'], default='max')
     parser.add_argument('--namespace', default='default')
     parser.add_argument('--interval', type=int, default=30)
     parser.add_argument('--scale-up-threshold', type=float, default=300000, help='Scale up threshold in microseconds')
@@ -251,4 +263,5 @@ if __name__ == "__main__":
     
     vpa.scale_up_threshold = args.scale_up_threshold
     vpa.scale_down_threshold = args.scale_down_threshold
+    vpa.policy = ScalingPolicy[args.policy.upper()]
     vpa.monitor_and_scale(args.deployment, args.container)
