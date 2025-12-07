@@ -15,7 +15,7 @@ chmod +x mongo_ycsb_benchmark.sh
 # Run the script
 ./mongo_ycsb_benchmark.sh
 
-# To run Mongo benchmark - spike, stress, soak - from within GCP:
+# To run Mongo benchmark - spike, stress, soak - from within GCP. Please note this will take several minutes to complete:
 # Download from GitHub
 curl -o sss_mongo_ycsb_benchmark.sh https://raw.githubusercontent.com/SonNguyen415/CS239-project/main/
 scripts/sss_mongo_ycsb_benchmark.sh
