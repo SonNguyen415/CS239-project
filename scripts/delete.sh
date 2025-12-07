@@ -1,13 +1,7 @@
 #!/bin/bash
 set -e
-
 # -----------------------------
-# Arguments
-# -----------------------------
-VPA=${1:-false}  # optional argument: "true" to deploy vpa.yaml, default is false
-
-# -----------------------------
-# Files to deploy
+# Files to delete
 # -----------------------------
 FILES=(
     "k8s-mongo/prometheus.yaml"
@@ -15,29 +9,20 @@ FILES=(
     "k8s-mongo/user-db.yaml"
     "k8s-mongo/ycsb.yaml"
     "k8s-mongo/mongodb-exporter.yaml"
+    "k8s-mongo/vpa.yaml"
     "sqlYCSB/catalogue-db-deployment.yaml"
     "sqlYCSB/ycsb-interface-deployment.yaml"
 )
 
-VPA_FILE="k8s-mongo/vpa.yaml"
-# Add VPA file if requested
-if [[ "$VPA" == "true" ]]; then
-    FILES+=("$VPA_FILE")
-    kubectl create configmap vpa-script --from-file="$VPA_FILE"
-    echo "VPA deployment enabled: vpa.yaml will be applied."
-else
-    echo "VPA deployment disabled: skipping vpa.yaml."
-fi
-
 # -----------------------------
 # Function to apply a list of files
 # -----------------------------
-apply_files() {
+delete_deployments() {
     local files=("$@")
     for file in "${files[@]}"; do
         if [[ -f "$file" ]]; then
-            echo "Applying $file..."
-            kubectl apply -f "$file"
+            echo "Deleting deployment $file..."
+            kubectl delete -f "$file"
         else
             echo "Warning: $file does not exist, skipping."
         fi
@@ -47,6 +32,6 @@ apply_files() {
 # -----------------------------
 # Apply files
 # -----------------------------
-apply_files "${FILES[@]}"
+delete_deployments "${FILES[@]}"
 
-echo "Deployment complete."
+echo "Deletion complete."
