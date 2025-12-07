@@ -10,7 +10,7 @@ metadata:
   name: vpa-controller
 rules:
 - apiGroups: ["apps"]
-  resources: ["deployments"]
+  resources: ["deployments", "statefulsets"]
   verbs: ["get", "list", "watch", "update", "patch"]
 - apiGroups: [""]
   resources: ["pods"]
@@ -61,7 +61,8 @@ spec:
             --deployment=user-db \
             --container=user-db \
             --namespace=default \
-            --interval=30 \
+            --policy=avg \
+            --interval=10 \
             --scale-up-threshold=2000 \
             --scale-down-threshold=1000
         volumeMounts:

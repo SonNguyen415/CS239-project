@@ -14,30 +14,27 @@ from enum import Enum
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 class ScalingPolicy(Enum):
-    P90 = "max(ycsb_live_op_p90_us)"
-    AVG = "sum(ycsb_live_op_avg_us * ycsb_live_op_count) / sum(ycsb_live_op_count)"
-    MAX = "max(ycsb_live_op_max_us)"
-
-    @property
-    def prom_query(self):
-        return self.value
+    P90 = 1
+    AVG = 2
+    MAX = 3
 
 # Scaling factors - set by policy / arguments
 SCALE_UP_FACTOR = 1.5
 SCALE_DOWN_FACTOR = 0.8
 RESOURCE_LIMIT_FACTOR = 1.2
 
-# Resource bounds - this doesn't matter will be set  
+# Resource bounds -- adjust as needed
 MIN_CPU = "50m"
-MAX_CPU = "200m"
+MAX_CPU = "400m"
 MIN_MEMORY = "64Mi"
-MAX_MEMORY = "256Mi"
+MAX_MEMORY = "1Gi"
 
-# Cooldown period (seconds)
-COOLDOWN_PERIOD = 30 # for testing
+# Cooldown period and NaN handling (if NaN persists then assume inactive - scale down)
+COOLDOWN_PERIOD = 10 # for testing
+NAN_SCALE_DOWN_DELAY = 30 
 
 class LatencyBasedVPA:
-    def __init__(self, prometheus_url, namespace="default", check_interval=30):
+    def __init__(self, prometheus_url, namespace="default", check_interval=10):
         try:
             config.load_incluster_config()
         except:
@@ -48,13 +45,19 @@ class LatencyBasedVPA:
         self.check_interval = check_interval
         self.prometheus_url = prometheus_url.rstrip('/')
 
-        self.policy = ScalingPolicy.MAX # Default policy
+        # Apply bounds
+        self.min_cpu = self._parse_cpu(MIN_CPU)
+        self.max_cpu = self._parse_cpu(MAX_CPU)
+        self.min_mem = self._parse_memory(MIN_MEMORY)
+        self.max_mem = self._parse_memory(MAX_MEMORY)
+        self.policy = ScalingPolicy.AVG # Default policy
         
         # Latency thresholds (microseconds)
-        self.scale_up_threshold = 2000  # 2ms in us
-        self.scale_down_threshold = 1000  # 1ms in us
+        self.scale_up_threshold = 2000  
+        self.scale_down_threshold = 1000  
         
         self.last_scale_time = 0
+        self.nan_start_time = None  
         
     def query_prometheus(self, query):
         try:
@@ -118,41 +121,54 @@ class LatencyBasedVPA:
             return f"{int(mi/1024)}Gi"
         return f"{int(mi)}Mi"
     
+   
+
     def calculate_new_resources(self, latency_us, current_cpu, current_memory):
         logger.info(f"Current resources - CPU: {current_cpu}m, Memory: {current_memory}Mi")
+        
         
         # Check cooldown
         time_since_last_scale = time.time() - self.last_scale_time
         if time_since_last_scale < COOLDOWN_PERIOD:
             remaining = int(COOLDOWN_PERIOD - time_since_last_scale)
             return current_cpu, current_memory, "cooldown", f"Cooldown: {remaining}s left"
-        
-        # Determine scaling action
-        if latency_us > self.scale_up_threshold:
-            new_cpu = current_cpu * SCALE_UP_FACTOR
-            new_memory = current_memory * SCALE_UP_FACTOR
-            action = "scale_up"
-            reason = f"High latency: {latency_us:.0f}us > {self.scale_up_threshold}us"
-        elif latency_us < self.scale_down_threshold:
-            new_cpu = current_cpu * SCALE_DOWN_FACTOR
-            new_memory = current_memory * SCALE_DOWN_FACTOR
-            action = "scale_down"
-            reason = f"Low latency: {latency_us:.0f}us < {self.scale_down_threshold}us"
+    
+        # Handle NaN latency - scale down if NaN persists (assume inactive)
+        if latency_us is None or (isinstance(latency_us, float) and latency_us != latency_us):  # NaN check
+            if self.nan_start_time is None:
+                self.nan_start_time = time.time()
+                return current_cpu, current_memory, "no_change", "Latency NaN, starting timer"
+            
+            time_nan = time.time() - self.nan_start_time
+            if time_nan >= NAN_SCALE_DOWN_DELAY:
+                new_cpu = current_cpu * SCALE_DOWN_FACTOR
+                new_memory = current_memory * SCALE_DOWN_FACTOR
+                action = "scale_down"
+                reason = f"Latency NaN for {int(time_nan)}s -> scale down"
         else:
-            return current_cpu, current_memory, "no_change", f"Latency OK: {latency_us:.0f}us"
+            # reset NaN timer
+            self.nan_start_time = None
+
+            # Normal scaling logic
+            if latency_us > self.scale_up_threshold:
+                new_cpu = current_cpu * SCALE_UP_FACTOR
+                new_memory = current_memory * SCALE_UP_FACTOR
+                action = "scale_up"
+                reason = f"High latency: {latency_us:.0f}us > {self.scale_up_threshold}us"
+            elif latency_us < self.scale_down_threshold:
+                new_cpu = current_cpu * SCALE_DOWN_FACTOR
+                new_memory = current_memory * SCALE_DOWN_FACTOR
+                action = "scale_down"
+                reason = f"Low latency: {latency_us:.0f}us < {self.scale_down_threshold}us"
+            else:
+                return current_cpu, current_memory, "no_change", f"Latency OK: {latency_us:.0f}us"
         
-        # Apply bounds
-        min_cpu = self._parse_cpu(MIN_CPU)
-        max_cpu = self._parse_cpu(MAX_CPU)
-        min_mem = self._parse_memory(MIN_MEMORY)
-        max_mem = self._parse_memory(MAX_MEMORY)
-        
-        new_cpu = max(min_cpu, min(max_cpu, new_cpu))
-        new_memory = max(min_mem, min(max_mem, new_memory))
+        new_cpu = max(self.min_cpu, min(self.max_cpu, new_cpu))
+        new_memory = max(self.min_mem, min(self.max_mem, new_memory))
         
         self.last_scale_time = time.time()
         return new_cpu, new_memory, action, reason
-    
+
     def update_deployment_resources(self, deployment_name, container_name, new_cpu, new_memory):
         try:
             deployment = self.apps_v1.read_namespaced_deployment(
