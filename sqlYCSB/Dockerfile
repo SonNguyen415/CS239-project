@@ -331,21 +331,34 @@ echo "================================================="\n\
 ./bin/ycsb load jdbc -P workloads/sockshop_mysql_load -s\n\
 \n\
 
+
 echo ""\n\
 echo "================================================="\n\
-echo "Phase 2: RUNNING Spike Test..."\n\
+echo "Phase 1: RUNNING Stress Test Load..."\n\
+echo "================================================="\n\
+./bin/ycsb run jdbc -P workloads/stress_test_load -s\n\
+
+echo ""\n\
+echo "================================================="\n\
+echo "Phase 2: RUNNING Stress Test..."\n\
+echo "================================================="\n\
+./bin/ycsb run jdbc -P workloads/stress_teset -s\n\
+
+echo ""\n\
+echo "================================================="\n\
+echo "Phase 3: RUNNING Spike Test..."\n\
 echo "================================================="\n\
 ./bin/ycsb run jdbc -P workloads/spike_test -s\n\
 
 echo ""\n\
 echo "================================================="\n\
-echo "Phase 3: RUNNING Soak Test Load..."\n\
+echo "Phase 4: RUNNING Soak Test Load..."\n\
 echo "================================================="\n\
 ./bin/ycsb run jdbc -P workloads/soak_test_load -s\n\
 
 echo ""\n\
 echo "================================================="\n\
-echo "Phase 4: RUNNING Soak Test..."\n\
+echo "Phase 5: RUNNING Soak Test..."\n\
 echo "================================================="\n\
 ./bin/ycsb run jdbc -P workloads/soak_test -s\n\
 
@@ -412,17 +425,6 @@ echo "Phase 4: RUNNING Workload E..."\n\
 echo "================================================="\n\
 ./bin/ycsb run jdbc -P workloads/workloade -s\n\
 
-echo ""\n\
-echo "================================================="\n\
-echo "Phase 5: RUNNING Stress Test Load..."\n\
-echo "================================================="\n\
-./bin/ycsb run jdbc -P workloads/stress_test_load -s\n\
-
-echo ""\n\
-echo "================================================="\n\
-echo "Phase 6: RUNNING Stress Test..."\n\
-echo "================================================="\n\
-./bin/ycsb run jdbc -P workloads/stress_teset -s\n\
 
 \n\
 echo ""\n\
