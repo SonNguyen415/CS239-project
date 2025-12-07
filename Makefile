@@ -10,7 +10,8 @@ ARCH ?= $(shell uname -m)   # auto-detect architecture (x86_64, arm64, etc.)
 # Script paths
 SCRIPTS_DIR=scripts
 GCLOUD_INSTALL=$(SCRIPTS_DIR)/gcloud_install.sh
-GCLOUD_CONFIGURE=$(SCRIPTS_DIR)/gcloud_configure.sh
+GCLOUD_CONFIGURE_AUTOPILOT=$(SCRIPTS_DIR)/gcloud_configure.sh
+GCLOUD_CONFIGURE_STANDARD=$(SCRIPTS_DIR)/gcloud_configure_standard.sh
 BUILD=$(SCRIPTS_DIR)/build.sh
 DEPLOY=$(SCRIPTS_DIR)/deploy.sh
 
@@ -31,15 +32,19 @@ install:
 
 configure:
 	@echo "Configuring gcloud, GKE, Artifact Registry, and building images..."
-	$(GCLOUD_CONFIGURE) $(PROJECT_ID) $(REPO_BASE)
+	$(GCLOUD_CONFIGURE_AUTOPILOT) $(PROJECT_ID) $(REPO_BASE)
 
 build:
 	@echo "Building Docker images..."
 	$(BUILD) $(REPO_BASE)
 
 deploy:
-	@echo "Deploying to GKE..."
+	@echo "Deploying to GKE (without VPA)..."
 	$(DEPLOY)
+
+deploy_vpa:
+	@echo "Deploying to GKE with VPA enabled..."
+	$(DEPLOY) true
 
 # -----------------------------
 # Help
@@ -47,12 +52,13 @@ deploy:
 .PHONY: help
 help:
 	@echo "Usage:"
-	@echo "  make PROJECT_ID=<project> REPO_BASE=<repo> ARCH=<arch>    	# Configure, build, and deploy (assumes gcloud installed)"
-	@echo "  make all PROJECT_ID=<project> REPO_BASE=<repo> ARCH=<arch> # Install gcloud + everything"
-	@echo "  make install ARCH=<arch>    								# Install gcloud SDK"
-	@echo "  make configure PROJECT_ID=<project> 						# Configure gcloud, GKE, Artifact Registry, and build images"
-	@echo "  make build REPO_BASE=<repo>     							# Build Docker images"
-	@echo "  make deploy     											# Deploy to GKE"
-	@echo "  make help       											# Show this help message"
+	@echo "  make PROJECT_ID=<project> REPO_BASE=<repo> ARCH=<arch>         # Configure, build, and deploy (assumes gcloud installed)"
+	@echo "  make all PROJECT_ID=<project> REPO_BASE=<repo> ARCH=<arch>    # Install gcloud + everything"
+	@echo "  make install ARCH=<arch>                                       # Install gcloud SDK"
+	@echo "  make configure PROJECT_ID=<project>                            # Configure gcloud, GKE, Artifact Registry, and build images"
+	@echo "  make build REPO_BASE=<repo>                                    # Build Docker images"
+	@echo "  make deploy                                                    # Deploy to GKE without VPA"
+	@echo "  make deploy_vpa                                                # Deploy to GKE with VPA"
+	@echo "  make help                                                      # Show this help message"
 
-.PHONY: default all install configure build deploy help
+.PHONY: default all install configure build deploy deploy_vpa help

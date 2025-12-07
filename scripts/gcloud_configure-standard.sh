@@ -13,6 +13,8 @@ fi
 # -----------------------------
 REGION="us-central1"
 CLUSTER_NAME="my-gke-cluster"
+NODE_COUNT=2
+MACHINE_TYPE="e2-standard-2"
 REPO_NAME="sockshop"
 # -----------------------------
 
@@ -29,12 +31,13 @@ echo "Installing GKE auth plugin..."
 gcloud components install gke-gcloud-auth-plugin -q
 
 # -----------------------------
-# Create GKE Autopilot cluster
+# Create GKE cluster
 # -----------------------------
-echo "Creating GKE Autopilot cluster '$CLUSTER_NAME' in $REGION..."
+echo "Creating GKE cluster '$CLUSTER_NAME' in $REGION with $NODE_COUNT nodes..."
 gcloud container clusters create "$CLUSTER_NAME" \
   --region "$REGION" \
-  --autopilot \
+  --num-nodes "$NODE_COUNT" \
+  --machine-type "$MACHINE_TYPE" \
   --release-channel "regular"
 
 echo "Fetching cluster credentials..."
@@ -69,4 +72,4 @@ else
     echo "Warning: build.sh not found. Skipping build step."
 fi
 
-echo "Gcloud + GKE Autopilot + Artifact Registry setup complete!"
+echo "Gcloud + GKE + Artifact Registry setup complete!"
