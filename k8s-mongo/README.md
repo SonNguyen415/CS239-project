@@ -16,15 +16,6 @@ kubectl exec -it ycsb-interface-56cdb55444-vh7xm -- /bin/bash
 # Run workload E - quick example
 ~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloade \ -p operationcount=1000 \ -p mongodb.url="mongodb://user-db:27017/users" \ -p mongodb.collection=usertable | tee -a /results/ycsb_output.txt
 
-# Stress Test
-~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloada \ -p operationcount=50000 \  -p target=1000 \ -p mongodb.url="mongodb://user-db:27017/users" \ -p mongodb.collection=usertable | tee -a /results/ycsb_stress_test.txt
-
-# Spike test
-~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloada \ -p operationcount=10000 \ -p target=2000 \ -p mongodb.url="mongodb://user-db:27017/users" \ -p mongodb.collection=usertable | tee -a /results/ycsb_spike_peak.txt
-
-# Soak test
-~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/workloada \ -p operationcount=100000 \ -p target=200 \ -p mongodb.url="mongodb://user-db:27017/users" \ -p mongodb.collection=usertable | tee -a /results/ycsb_soak_test.txt
-
 # Exec into user-db and manipulate the database
 kubectl exec -it user-db-7f86694cb8-tzjgg  -- bash
 
