@@ -14,29 +14,21 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.37.0 (HEAD)
   labels:
     io.kompose.service: user-db
   name: user-db
 spec:
-  replicas: 1  # Keep at 1 for vertical scaling
+  replicas: 1
   selector:
     matchLabels:
       io.kompose.service: user-db
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert
-        kompose.version: 1.37.0 (HEAD)
-        prometheus.io/scrape: "true"  # Enable Prometheus scraping if needed
-        prometheus.io/port: "27017"
       labels:
         io.kompose.service: user-db
     spec:
       nodeSelector:                    
-        workload-type: mongo  # Pin to specific node
+        workload-type: mongo
       containers:
         - image: weaveworksdemos/user-db:0.4.0
           name: user-db
@@ -44,13 +36,12 @@ spec:
             - containerPort: 27017
               protocol: TCP
           resources:
-            # Starting resources - VPA will adjust these
             requests:
-              cpu: 100m      
-              memory: 128Mi  
+              cpu: 50m
+              memory: 64Mi  
             limits:
-              cpu: 500m      # VPA will update this
-              memory: 512Mi  # VPA will update this
+              cpu: 100m
+              memory: 128Mi
           volumeMounts:
             - mountPath: /data/db
               name: user-db-pvc
@@ -63,9 +54,6 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.37.0 (HEAD)
   labels:
     io.kompose.service: user-db
   name: user-db
@@ -76,22 +64,3 @@ spec:
       targetPort: 27017
   selector:
     io.kompose.service: user-db
----
-# Configuration for your custom latency-based VPA
-# This is a ConfigMap to store VPA settings
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: user-db-vpa-config
-data:
-  deployment_name: "user-db"
-  container_name: "user-db"
-  target_latency_ms: "200"
-  scale_up_threshold_ms: "300"
-  scale_down_threshold_ms: "100"
-  min_cpu: "100m"
-  max_cpu: "4000m"
-  min_memory: "128Mi"
-  max_memory: "4Gi"
-  check_interval_seconds: "30"
-  cooldown_period_seconds: "300"

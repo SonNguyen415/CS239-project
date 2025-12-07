@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: mongodb-exporter
-        image: percona/mongodb-exporter:0.20.7
+        image: percona/mongodb_exporter:0.40
         args:
           - "--mongodb.uri=mongodb://user-db:27017"
         ports:

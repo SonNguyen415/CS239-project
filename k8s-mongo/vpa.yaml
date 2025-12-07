@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vpa-controller
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: vpa-controller
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch", "update", "patch"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vpa-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vpa-controller
+subjects:
+- kind: ServiceAccount
+  name: vpa-controller
+  namespace: default
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vpa
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vpa
+  template:
+    metadata:
+      labels:
+        app: vpa
+    spec:
+      serviceAccountName: vpa-controller
+      containers:
+      - name: vpa-controller
+        image: python:3.11-slim
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -e
+          echo "Installing dependencies..."
+          pip install --no-cache-dir requests kubernetes
+          echo "Starting VPA controller..."
+          python /app/vpa.py \
+            --prometheus-url=http://prometheus:9090 \
+            --deployment=user-db \
+            --container=user-db \
+            --namespace=default \
+            --interval=30 \
+            --scale-up-threshold=2000 \
+            --scale-down-threshold=1000
+        volumeMounts:
+        - name: vpa-script
+          mountPath: /app
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+      volumes:
+      - name: vpa-script
+        configMap:
+          name: vpa-script
