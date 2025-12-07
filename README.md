@@ -5,7 +5,7 @@
 `kubectl create configmap vpa-script --from-file="k8s-mongo/vpa.py"`
 VPA DOES NOT WORK WITH THE YCSB WORKLOAD - IT NEEDS TO DELETE POD TO SCALE THEM CREATING DOWNTIME WHICH WILL CRASH THE YCSB. I HAVE YET TO FIGURE OUT HOW TO USE REPLICA SETS TO MAKE THEM HIGHLY AVAILABLE
 
-# To run mongo benchmark:
+# To run mongo benchmark - quick - from within CGP:
 # Download the updated script from GitHub
 curl -o mongo_ycsb_benchmark.sh https://raw.githubusercontent.com/SonNguyen415/CS239-project/main/scripts/mongo_ycsb_benchmark.sh
 
@@ -14,3 +14,13 @@ chmod +x mongo_ycsb_benchmark.sh
 
 # Run the script
 ./mongo_ycsb_benchmark.sh
+
+# To run Mongo benchmark - spike, stress, soak - from within GCP:
+# Download from GitHub
+curl -o SSS_mongo_ycsb_benchmark.sh https://raw.githubusercontent.com/SonNguyen415/CS239-project/main/scripts/SSS_mongo_ycsb_benchmark.sh
+
+# Make it executable
+chmod +x SSS_mongo_ycsb_benchmark.sh
+
+# Run it
+./SSS_mongo_ycsb_benchmark.sh
