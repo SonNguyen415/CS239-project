@@ -27,6 +27,11 @@ data:
           - targets: ['ycsb-interface:8001']
         scrape_interval: 2s
 
+      - job_name: 'sqlycsb-live-exporter'
+        static_configs:
+          - targets: ['mysql-ycsb-interface:3308']
+        scrape_interval: 2s
+
       - job_name: 'mongodb-exporter'
         static_configs:
           - targets: ['mongodb-exporter:9216']

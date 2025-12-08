@@ -31,3 +31,22 @@ spec:
           stdin: true
           tty: true
       restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: mysql-ycsb-interface
+  name: mysql-ycsb-interface
+spec:
+  selector:
+    io.kompose.service: mysql-ycsb-interface
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: 3306
+      protocol: TCP
+    - name: mysql-alt
+      port: 3308
+      targetPort: 3308
+      protocol: TCP
