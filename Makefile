@@ -15,9 +15,9 @@ BUILD=$(SCRIPTS_DIR)/build.sh
 DEPLOY=$(SCRIPTS_DIR)/deploy.sh
 DELETE=$(SCRIPTS_DIR)/delete.sh
 MONGO_BENCHMARK=$(SCRIPTS_DIR)/mongo_benchmark.sh
-MONGO_SSS=$(SCRIPTS_DIR)/mongo_sss_benchmark.sh
-SQL_BENCHMARK=$(SCRIPTS_DIR)/sql_ycsb_benchmark.sh
-SQL_SSS=$(SCRIPTS_DIR)/sql_sss_benchmark.sh
+MONGO_SSS=$(SCRIPTS_DIR)/sss_mongo_ycsb_benchmark.sh
+SQL_BENCHMARK=$(SCRIPTS_DIR)/mysql_ycsb_benchmark.sh
+SQL_SSS=$(SCRIPTS_DIR)/sss_mysql_ycsb_benchmark.sh
 
 # PID files for port-forward processes
 GRAFANA_PID_FILE=/tmp/grafana-port-forward.pid
