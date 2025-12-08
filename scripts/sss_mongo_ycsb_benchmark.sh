@@ -99,12 +99,12 @@ case $choice in
     1)
         # Spike Test
         run_ycsb_command "SPIKE TEST - High throughput burst (20k ops, 10k ops/sec, 1000 threads)" \
-            "$YCSB_PATH run mongodb -s -P $WORKLOAD_PATH/workloadb -p operationcount=20000 -p target=10000 -p threadcount=1000 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION | tee -a /results/ycsb_spike.txt"
+            "$YCSB_PATH run mongodb -s -P $WORKLOAD_PATH/workloadb -p operationcount=20000 -p target=10000 -p threadcount=500 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION | tee -a /results/ycsb_spike.txt"
         ;;
     2)
         # Stress Test
         run_ycsb_command "STRESS TEST - Sustained high load (1M ops, 2k ops/sec, 1000 threads)" \
-            "$YCSB_PATH run mongodb -s -P $WORKLOAD_PATH/workloadb -p operationcount=1000000 -p target=2000 -p threadcount=1000 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION | tee -a /results/ycsb_stress.txt"
+            "$YCSB_PATH run mongodb -s -P $WORKLOAD_PATH/workloadb -p operationcount=1000000 -p target=2000 -p threadcount=500 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION | tee -a /results/ycsb_stress.txt"
         ;;
     3)
         # Soak Test
@@ -114,10 +114,10 @@ case $choice in
     4)
         # All Tests
         run_ycsb_command "SPIKE TEST - High throughput burst (20k ops, 10k ops/sec, 1000 threads)" \
-            "$YCSB_PATH run mongodb -s -P $WORKLOAD_PATH/workloadb -p operationcount=20000 -p target=10000 -p threadcount=1000 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION | tee -a /results/ycsb_spike.txt"
+            "$YCSB_PATH run mongodb -s -P $WORKLOAD_PATH/workloadb -p operationcount=20000 -p target=10000 -p threadcount=500 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION | tee -a /results/ycsb_spike.txt"
         
         run_ycsb_command "STRESS TEST - Sustained high load (1M ops, 2k ops/sec, 1000 threads)" \
-            "$YCSB_PATH run mongodb -s -P $WORKLOAD_PATH/workloadb -p operationcount=1000000 -p target=2000 -p threadcount=1000 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION | tee -a /results/ycsb_stress.txt"
+            "$YCSB_PATH run mongodb -s -P $WORKLOAD_PATH/workloadb -p operationcount=1000000 -p target=2000 -p threadcount=500 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION | tee -a /results/ycsb_stress.txt"
         
         run_ycsb_command "SOAK TEST - Long duration stability (450k ops, 500 ops/sec, 50 threads)" \
             "$YCSB_PATH run mongodb -s -P $WORKLOAD_PATH/workloadb -p operationcount=450000 -p target=500 -p threadcount=50 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION | tee -a /results/ycsb_soak.txt"
