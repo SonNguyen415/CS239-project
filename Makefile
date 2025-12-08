@@ -54,9 +54,7 @@ deploy_vpa:
 	@echo "Deploying to GKE with VPA enabled..."
 	$(DEPLOY) true
 
-delete:
-	@echo "Deleting deployment from GKE..."
-	$(DELETE)
+
 
 grafana:
 	@echo "Starting Grafana port-forward in background (localhost:3000)..."
@@ -118,6 +116,12 @@ status:
 	else \
 		echo "  Prometheus: STOPPED"; \
 	fi
+
+delete:
+	@echo "Deleting deployment from GKE..."
+	$(DELETE)
+	@rm -f $(GRAFANA_PID_FILE)
+	@rm -f $(PROMETHEUS_PID_FILE)
 
 mongo_benchmark:
 	@$(MONGO_BENCHMARK)

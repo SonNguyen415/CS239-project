@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+
 # -----------------------------
 # Files to delete
 # -----------------------------
@@ -22,7 +23,7 @@ delete_deployments() {
     for file in "${files[@]}"; do
         if [[ -f "$file" ]]; then
             echo "Deleting deployment $file..."
-            kubectl delete -f "$file"
+            kubectl delete -f "$file" --ignore-not-found=true
         else
             echo "Warning: $file does not exist, skipping."
         fi

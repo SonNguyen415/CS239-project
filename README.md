@@ -17,9 +17,13 @@ You can now run the workloads. The available workloads you can run are:
 - `make sql_benchmark`: to run the regular benchmarks on `SQL`
 - `make sql_sss`: to run the stress, soak, or spike benchmarks on `SQL`
 
-Run `make grafana` to start grafana on the background and observe latency metric in real time. You can check the Google Cloud Console for each pod to see resource utilization. 
+Run `make grafana` to start grafana on the background and observe latency metric in real time. You can check the Google Cloud Console for each pod to see resource utilization.
 
 Clean up all deployments at the end via `make delete`.
+
+### Grafana Logins
+- username: `admin`
+- password: `admin`
 
 ### Notes
 1. CLI authentication will have to be done in the browser, simply click in the link provided in the terminal.
