@@ -10,8 +10,7 @@ CLUSTER_NAME ?= sockshop-cluster
 # Script paths
 SCRIPTS_DIR=scripts
 GCLOUD_INSTALL=$(SCRIPTS_DIR)/gcloud_install.sh
-GCLOUD_CONFIGURE_AUTOPILOT=$(SCRIPTS_DIR)/gcloud_configure.sh
-GCLOUD_CONFIGURE_STANDARD=$(SCRIPTS_DIR)/gcloud_configure_standard.sh
+GCLOUD_CONFIGURE=$(SCRIPTS_DIR)/gcloud_configure_standard.sh
 BUILD=$(SCRIPTS_DIR)/build.sh
 DEPLOY=$(SCRIPTS_DIR)/deploy.sh
 DELETE=$(SCRIPTS_DIR)/delete.sh
@@ -41,7 +40,7 @@ install:
 
 configure:
 	@echo "Configuring gcloud, GKE, Artifact Registry, and building images..."
-	$(GCLOUD_CONFIGURE_AUTOPILOT) $(CLUSTER_NAME)
+	$(GCLOUD_CONFIGURE) $(CLUSTER_NAME)
 
 build:
 	@echo "Building Docker images..."
