@@ -21,6 +21,11 @@ Run `make grafana` to start grafana on the background and observe latency metric
 
 Clean up all deployments at the end via `make delete`.
 
+### Notes
+1. CLI authentication will have to be done in the browser, simply click in the link provided in the terminal.
+2. You can also make and set up a project as in the \link[CSE239 tutorial](https://docs.google.com/document/d/17wwMTqH1IiOC0xPB197kyeSXxt7sWPFGtcueRbRqm8M/edit?tab=t.utw4rgyxe61u) if the `build` and `configure` commands result in errors.
+3. You can change `sqlYCSB/sql-ycsb/` to `sqlYCSB` for a simpler image for the `sql` if the `sql-ycsb` results in errors.
+
 
 ## VPA
 `kubectl delete configmap vpa-script`
