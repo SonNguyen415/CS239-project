@@ -23,7 +23,7 @@ spec:
       containers:
         - args:
             - /bin/bash
-          image: us-central1-docker.pkg.dev/sinuous-env-478221-k0/sock-shop/mysql-ycsb:latest
+          image: <repo>/<project_id>/<repo_name>/<image_name>:<tag>
           name: mysql-ycsb-interface
           ports:
             - containerPort: 3306

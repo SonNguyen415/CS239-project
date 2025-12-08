@@ -17,7 +17,7 @@ fi
 # -----------------------------
 IMAGES=(
   "ycsb-new:k8s-mongo/ycsb-combined/:k8s-mongo/ycsb.yaml"
-  "sqlYCSB:sqlYCSB/:sqlYCSB/sql-ycsb-compose.yaml"
+  "sqlYCSB:sqlYCSB/:sqlYCSB/ycsb-interface-deployment.yaml"
 )
 FLAGS="-t"
 # -----------------------------
