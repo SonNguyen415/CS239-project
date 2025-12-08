@@ -114,7 +114,6 @@ fieldcount=10\n\
 fieldlength=100\n\
 readallfields=true\n\
 writeallfields=true\n\
-insertproportion=1.0\n\
 requestdistribution=uniform\n\
 insertorder=hashed\n\
 jdbc.batchupdateapi=false\n\
@@ -134,7 +133,6 @@ fieldcount=10\n\
 fieldlength=100\n\
 readallfields=true\n\
 writeallfields=true\n\
-insertproportion=1.0\n\
 requestdistribution=uniform\n\
 insertorder=hashed\n\
 jdbc.batchupdateapi=false\n\
@@ -252,7 +250,7 @@ jdbc.autocommit=true\n" \
 
 # Create workload for LOAD phase (inserts only)
 RUN printf "recordcount=1000\n\
-operationcount=10000\n\
+operationcount=1000\n\
 workload=site.ycsb.workloads.CoreWorkload\n\
 \n\
 # MySQL/JDBC specific settings\n\
@@ -286,7 +284,7 @@ requestdistribution=uniform\n\
 \n\
 # Insert configuration\n\
 insertstart=0\n\
-insertcount=10000\n\
+insertcount=1000\n\
 insertorder=hashed\n\
 \n\
 # Performance tuning\n\
@@ -323,26 +321,18 @@ EOF\n\
 \n\
 echo "Table created successfully!"\n\
 \n\
-# Run LOAD phase\n\
-echo ""\n\
-echo "================================================="\n\
-echo "Phase 1: LOADING data..."\n\
-echo "================================================="\n\
-./bin/ycsb load jdbc -P workloads/sockshop_mysql_load -s\n\
-\n\
-
 
 echo ""\n\
 echo "================================================="\n\
 echo "Phase 1: RUNNING Stress Test Load..."\n\
 echo "================================================="\n\
-./bin/ycsb run jdbc -P workloads/stress_test_load -s\n\
+./bin/ycsb load jdbc -P workloads/stress_test_load -s\n\
 
 echo ""\n\
 echo "================================================="\n\
 echo "Phase 2: RUNNING Stress Test..."\n\
 echo "================================================="\n\
-./bin/ycsb run jdbc -P workloads/stress_teset -s\n\
+./bin/ycsb run jdbc -P workloads/stress_test -s\n\
 
 echo ""\n\
 echo "================================================="\n\
@@ -354,7 +344,7 @@ echo ""\n\
 echo "================================================="\n\
 echo "Phase 4: RUNNING Soak Test Load..."\n\
 echo "================================================="\n\
-./bin/ycsb run jdbc -P workloads/soak_test_load -s\n\
+./bin/ycsb load jdbc -P workloads/soak_test_load -s\n\
 
 echo ""\n\
 echo "================================================="\n\
