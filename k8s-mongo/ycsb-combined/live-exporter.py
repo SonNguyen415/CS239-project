@@ -21,9 +21,6 @@ class YCSBExporter:
         self.op_max = prometheus_client.Gauge('ycsb_live_op_max_us', 'Max latency by type', ['op_type'])
         self.op_p90 = prometheus_client.Gauge('ycsb_live_op_p90_us', '90th percentile latency by type', ['op_type'])
         self.op_p99 = prometheus_client.Gauge('ycsb_live_op_p99_us', '99th percentile latency by type', ['op_type'])
-        self.op_p999 = prometheus_client.Gauge('ycsb_live_op_p999_us', '99.9th percentile latency by type', ['op_type'])
-        self.op_p9999 = prometheus_client.Gauge('ycsb_live_op_p9999_us', '99.99th percentile latency by type', ['op_type'])
-
         # State
         self.last_update = None
         self.lock = threading.Lock()
@@ -56,8 +53,6 @@ class YCSBExporter:
                 self.op_avg.labels(op_type=op_type).set(float(match.group(5)))
                 self.op_p90.labels(op_type=op_type).set(float(match.group(6)))
                 self.op_p99.labels(op_type=op_type).set(float(match.group(7)))
-                self.op_p999.labels(op_type=op_type).set(float(match.group(8)))
-                self.op_p9999.labels(op_type=op_type).set(float(match.group(9)))
                 parsed = True
                 print(f"[{time.strftime('%H:%M:%S')}] Metrics updated for op_type={op_type}", file=sys.stderr)
 
@@ -85,8 +80,6 @@ class YCSBExporter:
                         self.op_max.labels(op_type=op_type).set(0)
                         self.op_p90.labels(op_type=op_type).set(0)
                         self.op_p99.labels(op_type=op_type).set(0)
-                        self.op_p999.labels(op_type=op_type).set(0)
-                        self.op_p9999.labels(op_type=op_type).set(0)
 
                     print(f"[{time.strftime('%H:%M:%S')}] Metrics reset due to timeout", file=sys.stderr)
 
