@@ -63,10 +63,10 @@ gcloud auth configure-docker "${REGION}-docker.pkg.dev"
 # Run build script
 # -----------------------------
 if [ -f "$(dirname "$0")/build.sh" ]; then
-    echo "Running build.sh with REPO_BASE argument..."
+    echo "Running build.sh with REPO_BASE=$REPO_BASE"
     "$(dirname "$0")/build.sh" "$REPO_BASE"
 elif [ -f "./build.sh" ]; then
-    echo "Running build.sh with REPO_BASE argument..."
+    echo "Running build.sh with REPO_BASE=$REPO_BASE"
     ./build.sh "$REPO_BASE"
 else
     echo "Warning: build.sh not found. Skipping build step."
