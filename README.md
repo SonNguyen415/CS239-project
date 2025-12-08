@@ -31,10 +31,8 @@ Clean up all deployments at the end via `make delete`.
 3. You can change the build directory `sqlYCSB/sql-ycsb/` in `scripts/build.sh` to `sqlYCSB` for a simpler image for the `sql` if the `sql-ycsb` results in errors (line 20).
 
 
-## VPA
-`kubectl delete configmap vpa-script`
-`kubectl create configmap vpa-script --from-file="k8s-mongo/vpa.py"`
-VPA DOES NOT WORK WITH THE YCSB WORKLOAD - IT NEEDS TO DELETE POD TO SCALE THEM CREATING DOWNTIME WHICH WILL CRASH THE YCSB. I HAVE YET TO FIGURE OUT HOW TO USE REPLICA SETS TO MAKE THEM HIGHLY AVAILABLE
+## Known bugs
+1. VPA DOES NOT WORK WITH THE YCSB WORKLOAD - IT NEEDS TO DELETE POD TO SCALE THEM CREATING DOWNTIME WHICH WILL CRASH THE YCSB. I HAVE YET TO FIGURE OUT HOW TO USE REPLICA SETS TO GUARANTEE AVAILABILITY
 
 
 
