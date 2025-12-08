@@ -15,7 +15,10 @@ GCLOUD_CONFIGURE_STANDARD=$(SCRIPTS_DIR)/gcloud_configure_standard.sh
 BUILD=$(SCRIPTS_DIR)/build.sh
 DEPLOY=$(SCRIPTS_DIR)/deploy.sh
 DELETE=$(SCRIPTS_DIR)/delete.sh
-MONGO_BENCHMARK=$(SCRIPTS_DIR)/mongo_benchmark.sh
+MONGO_BENCHMARK=$(SCRIPTS_DIR)/mongo_ycsb_benchmark.sh
+MONGO_SSS=$(SCRIPTS_DIR)/mongo_sss_benchmark.sh
+SQL_BENCHMARK=$(SCRIPTS_DIR)/sql_ycsb_benchmark.sh
+SQL_SSS=$(SCRIPTS_DIR)/sql_sss_benchmark.sh
 
 # PID files for port-forward processes
 GRAFANA_PID_FILE=/tmp/grafana-port-forward.pid
@@ -120,12 +123,21 @@ status:
 mongo_benchmark:
 	@$(MONGO_BENCHMARK)
 
+mongo_sss:
+	@$(MONGO_SSS)
+
+sql_benchmark:
+	@$(SQL_BENCHMARK)
+
+sql_sss:
+	@$(SQL_SSS)
+
 # -----------------------------
 # Help
 # -----------------------------
 help:
 	@echo "Usage:"
-	@echo "  make CLUSTER_NAME=<cluster> REPO_BASE=<repo> ARCH=<arch>     # Configure, build, and deploy (assumes gcloud installed)"
+	@echo "  make CLUSTER_NAME=<cluster> REPO_BASE=<repo> ARCH=<arch>                            # Configure, build, and deploy (assumes gcloud installed)"
 	@echo "  make all CLUSTER_NAME=<cluster> REPO_BASE=<repo> ARCH=<arch> # Install gcloud + everything"
 	@echo "  make install ARCH=<arch>                                     # Install gcloud SDK"
 	@echo "  make configure CLUSTER_NAME=<cluster>                        # Configure gcloud, GKE, Artifact Registry, and build images"
@@ -139,6 +151,9 @@ help:
 	@echo "  make status                                                  # Check port-forward status"
 	@echo "  make delete                                                  # Delete deployment from GKE"
 	@echo "  make mongo_benchmark                                         # Run MongoDB YCSB benchmark"
+	@echo "  make mongo_sss                                               # Run MongoDB SSS benchmark"
+	@echo "  make sql_benchmark                                           # Run SQL YCSB benchmark"
+	@echo "  make sql_sss                                                 # Run SQL SSS benchmark"
 	@echo "  make help                                                    # Show this help message"
 
 .PHONY: default all install configure build deploy deploy_vpa delete grafana prometheus stop_grafana stop_prometheus status mongo_benchmark help 
