@@ -77,15 +77,15 @@ run_ycsb_command "LOAD PHASE - Loading 1,000 records" \
 
 # Workload A - Update heavy workload (50% read, 50% update)
 run_ycsb_command "WORKLOAD A - Update Heavy (50/50 read/update)" \
-    "$YCSB_PATH run mongodb -s -P $WORKLOAD_PATH/workloada -p operationcount=1000 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION | tee -a /results/ycsb_output.txt"
+    "$YCSB_PATH run mongodb -s -P $WORKLOAD_PATH/workloada -p operationcount=1000 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION"
 
 # Workload B - Read mostly workload (95% read, 5% update)
 run_ycsb_command "WORKLOAD B - Read Mostly (95/5 read/update)" \
-    "$YCSB_PATH run mongodb -s -P $WORKLOAD_PATH/workloadb -p operationcount=1000 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION | tee -a /results/ycsb_output.txt"
+    "$YCSB_PATH run mongodb -s -P $WORKLOAD_PATH/workloadb -p operationcount=1000 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION"
 
 # Workload E - Short ranges (95% scan, 5% insert)
 run_ycsb_command "WORKLOAD E - Short Ranges (95/5 scan/insert)" \
-    "$YCSB_PATH run mongodb -s -P $WORKLOAD_PATH/workloade -p operationcount=1000 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION | tee -a /results/ycsb_output.txt"
+    "$YCSB_PATH run mongodb -s -P $WORKLOAD_PATH/workloade -p operationcount=1000 -p mongodb.url=\"$MONGO_URL\" -p mongodb.collection=$COLLECTION"
 
 echo "======================================"
 echo "All benchmarks completed successfully!"
