@@ -19,6 +19,11 @@ RUN cd /root/ycsb-0.17.0/jdbc-binding/lib && \
     wget https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.0.33/mysql-connector-j-8.0.33.jar
 
 
+
+# Install Java, Python, wget, and other tools
+RUN apt-get update && \
+    apt-get install -y openjdk-11-jdk wget iputils-ping python3 python3-pip && \
+    rm -rf /var/lib/apt/lists/*
 # Install Python dependencies for the exporter
 RUN pip3 install prometheus-client==0.19.0 watchdog==3.0.0
 
