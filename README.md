@@ -24,6 +24,8 @@ Clean up all deployments at the end via `make delete`.
 ### Grafana Logins
 - username: `admin`
 - password: `admin`
+- Data source: `prometheus`
+- prometheus source: `http://prometheus:9090`
 
 ### Notes
 1. CLI authentication will have to be done in the browser, simply click in the link provided in the terminal.
