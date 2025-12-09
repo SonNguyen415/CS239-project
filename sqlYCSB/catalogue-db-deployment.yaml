@@ -29,5 +29,26 @@ spec:
             - name: MYSQL_ROOT_PASSWORD
           image: weaveworksdemos/catalogue-db:0.3.0
           name: catalogue-db
+          ports:
+            - containerPort: 3306
       hostname: catalogue-db
       restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.37.0 (HEAD)
+  labels:
+    io.kompose.service: catalogue-db
+  name: catalogue-db
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3306
+      targetPort: 3306
+      protocol: TCP
+      name: mysql
+  selector:
+    io.kompose.service: catalogue-db
