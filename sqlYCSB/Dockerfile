@@ -32,6 +32,70 @@ readmodifywriteproportion=0.2\n\
 requestdistribution=zipfian\n" \
     > /root/ycsb-0.17.0/workloads/iworkload
 
+
+# Load wrapper
+RUN printf '#!/bin/bash\n\
+RECORDCOUNT=100000\n\
+TARGET=200\n\
+OUTPUT=ycsb_output.txt\n\
+URL="mongodb://user-db:27017/users"\n\
+COLLECTION="usertable"\n\
+UPSERT=false\n\
+\n\
+while [ $# -gt 0 ]; do\n\
+  case "$1" in\n\
+    recordcount=*) RECORDCOUNT="${1#*=}" ;;\n\
+    target=*) TARGET="${1#*=}" ;;\n\
+    output=*) OUTPUT="${1#*=}" ;;\n\
+    url=*) URL="${1#*=}" ;;\n\
+    collection=*) COLLECTION="${1#*=}" ;;\n\
+    upsert=*) UPSERT="${1#*=}" ;;\n\
+    *) echo "Unknown argument: $1"; exit 1 ;;\n\
+  esac\n\
+  shift\n\
+done\n\
+\n\
+PARAMS="-p recordcount=$RECORDCOUNT -p target=$TARGET -p mongodb.url=$URL -p mongodb.collection=$COLLECTION"\n\
+if [ "$UPSERT" = "true" ]; then\n\
+    PARAMS="$PARAMS -p mongodb.upsert=true"\n\
+fi\n\
+\n\
+~/ycsb-0.17.0/bin/ycsb.sh load mongodb -s -P ~/ycsb-0.17.0/workloads/iworkload $PARAMS 2>&1 | tee >(cat > /tmp/ycsb_pipe) /results/$OUTPUT\n' \
+> /usr/local/bin/ycsb-load && chmod +x /usr/local/bin/ycsb-load
+
+# Run wrapper
+RUN printf '#!/bin/bash\n\
+WORKLOAD=workloada\n\
+OPCOUNT=50000\n\
+TARGET=1000\n\
+OUTPUT=ycsb_output.txt\n\
+URL="mongodb://user-db:27017/users"\n\
+COLLECTION="usertable"\n\
+UPSERT=false\n\
+\n\
+while [ $# -gt 0 ]; do\n\
+  case "$1" in\n\
+    workload=*) WORKLOAD="${1#*=}" ;;\n\
+    operationcount=*) OPCOUNT="${1#*=}" ;;\n\
+    target=*) TARGET="${1#*=}" ;;\n\
+    output=*) OUTPUT="${1#*=}" ;;\n\
+    url=*) URL="${1#*=}" ;;\n\
+    collection=*) COLLECTION="${1#*=}" ;;\n\
+    upsert=*) UPSERT="${1#*=}" ;;\n\
+    *) echo "Unknown argument: $1"; exit 1 ;;\n\
+  esac\n\
+  shift\n\
+done\n\
+\n\
+PARAMS="-p operationcount=$OPCOUNT -p target=$TARGET -p mongodb.url=$URL -p mongodb.collection=$COLLECTION"\n\
+if [ "$UPSERT" = "true" ]; then\n\
+    PARAMS="$PARAMS -p mongodb.upsert=true"\n\
+fi\n\
+\n\
+~/ycsb-0.17.0/bin/ycsb.sh run mongodb -s -P ~/ycsb-0.17.0/workloads/$WORKLOAD $PARAMS 2>&1 | tee >(cat > /tmp/ycsb_pipe) /results/$OUTPUT\n' \
+> /usr/local/bin/ycsb-run && chmod +x /usr/local/bin/ycsb-run
+
+
 # Create Sock Shop catalogue workload for MySQL
 RUN mkdir -p /root/ycsb-0.17.0/workloads && \
     printf "recordcount=10000\n\

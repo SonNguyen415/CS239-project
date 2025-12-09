@@ -72,19 +72,19 @@ echo ""
 echo "Starting YCSB benchmark sequence..."
 echo ""
 
-run_ycsb_command "LOAD PHASE - Loading 1,000 records" \
+run_ycsb_command "LOAD PHASE - Loading 10,000 records" \
     "$LOAD recordcount=10000 target=100 url=\"$MONGO_URL\" collection=$COLLECTION"
 
 # Workload A - Update heavy workload (50% read, 50% update)
 run_ycsb_command "WORKLOAD A - Update Heavy (50/50 read/update)" \
-    "$RUN workload=workloada operationcount=1000 url=\"$MONGO_URL\" collection=$COLLECTION upsert=true"
+    "$RUN workload=workloada operationcount=10000 url=\"$MONGO_URL\" collection=$COLLECTION upsert=true"
 
 # Workload B - Read mostly workload (95% read, 5% update)
 run_ycsb_command "WORKLOAD B - Read Mostly (95/5 read/update)" \
-    "$RUN workload=workloadb operationcount=1000 url=\"$MONGO_URL\" collection=$COLLECTION upsert=true"
+    "$RUN workload=workloadb operationcount=10000 url=\"$MONGO_URL\" collection=$COLLECTION upsert=true"
 # Workload E - Short ranges (95% scan, 5% insert)
 run_ycsb_command "WORKLOAD E - Short Ranges (95/5 scan/insert)" \
-    "$RUN workload=workloade operationcount=1000 url=\"$MONGO_URL\" collection=$COLLECTION upsert=true"
+    "$RUN workload=workloade operationcount=10000 url=\"$MONGO_URL\" collection=$COLLECTION upsert=true"
 
 echo "======================================"
 echo "All benchmarks completed successfully!"
